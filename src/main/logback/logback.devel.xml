@@ -7,7 +7,7 @@
     </encoder>
   </appender>
 
-  <logger name="l9g" level="TRACE" />
+  <logger name="l9g" level="DEBUG" />
    
   <root level="INFO" additivity="false">
     <appender-ref ref="CONSOLE" />
