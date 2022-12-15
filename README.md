@@ -31,6 +31,15 @@ build task
   - encrypt a password with `./bin/phosy-tool -e (plain password)` 
 5. Do NOT remove the created `config/secret.bin` file.
 
+## "Configure" your own attribute set
+
+1. edit `jsh/createAttributes.jsh`
+
+`jsh/createAttributes.jsh` is Java (NOT JavaScript) code, executed by the JShell for every single LDAP entry during the synchronization process.
+
+You can build your own phonenumber normalizer or specify how prefix and suffix will be created. Use the delivered code as a sample.
+
+
 ## Usage : ./bin/phosy-tool
 ```text
 Usage: phosy-tool [options]
