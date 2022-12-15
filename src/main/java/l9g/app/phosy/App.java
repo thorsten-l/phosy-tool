@@ -71,7 +71,7 @@ public class App
       {
         c = JAXB.unmarshal(new FileReader(configFile), Configuration.class);
 
-        LOGGER.debug("new config <{}>", c);
+        LOGGER.trace("config={}", c);
 
         if (c != null)
         {
