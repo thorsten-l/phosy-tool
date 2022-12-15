@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class PhonebookMain
 {
   private final static Logger LOGGER
-    = LoggerFactory.getLogger(App.class.getName());
+    = LoggerFactory.getLogger(PhonebookMain.class.getName());
 
   private static final String VAR_DIRECTORY_NAME = "var";
 
@@ -59,7 +59,7 @@ public class PhonebookMain
 
     timestampFile = new File(varDirectory, TIMESTAMP_FILENAME);
 
-    LOGGER.info("timestampFile={}", timestampFile.getAbsolutePath());
+    LOGGER.debug("timestampFile={}", timestampFile.getAbsolutePath());
   }
 
   public static PhonebookMain getInstance()
