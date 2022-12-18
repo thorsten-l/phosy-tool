@@ -8,6 +8,7 @@ ldapmigration.jar
 docker/data
 private/
 /config/
+/jsh/
 phosy-tool/
 production
 secret.bin
