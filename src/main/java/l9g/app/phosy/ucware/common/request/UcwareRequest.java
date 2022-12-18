@@ -33,6 +33,8 @@ public class UcwareRequest
   public UcwareRequest(String method)
   {
     this.method = method;
+    this.jsonrpc = "2.0";
+    this.id = "";
   }
 
   public UcwareRequest(String method, Object[] params)
@@ -41,11 +43,11 @@ public class UcwareRequest
     this.params = params;
   }
 
-  private String jsonrpc = "2.0";
+  private final String jsonrpc;
 
-  private String method;
+  private final String method;
 
   private Object[] params;
 
-  private String id = "";
+  private final String id;
 }
