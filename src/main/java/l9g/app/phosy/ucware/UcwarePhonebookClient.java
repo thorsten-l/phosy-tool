@@ -15,15 +15,12 @@
  */
 package l9g.app.phosy.ucware;
 
-import l9g.app.phosy.ucware.common.request.UcwareRequest;
 import l9g.app.phosy.ucware.common.response.UcwareBooleanResponse;
 import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamContact;
 import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamAttribute;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 import l9g.app.phosy.ucware.phonebook.model.UcwareAttribute;
 import l9g.app.phosy.ucware.phonebook.response.UcwareAttributeResponse;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContact;
@@ -42,29 +39,22 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public class UcwarePhonebookClient
+public class UcwarePhonebookClient extends UcwareClient
 {
-  private final static Logger LOGGER = LoggerFactory.getLogger(UcwarePhonebookClient.class.
-      getName());
-
-  private final WebTarget target;
+  private final static Logger LOGGER
+    = LoggerFactory.getLogger(UcwarePhonebookClient.class.getName());
 
   public UcwarePhonebookClient(WebTarget target)
   {
-    this.target = target;
+    super(target.path("/user/phonebook"));
   }
 
   public List<UcwarePhonebook> getAllUserPhonebooks()
   {
     LOGGER.debug("getAllUserPhonebooks()");
-    UcwareRequest request
-      = new UcwareRequest("getAll");
 
-    UcwareAllPhonebooksResponse response = target.path("/user/phonebook").
-      request(
-        MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwareAllPhonebooksResponse.class);
+    UcwareAllPhonebooksResponse response
+      = postRequest("getAll", UcwareAllPhonebooksResponse.class);
 
     final ArrayList<UcwarePhonebook> result = new ArrayList<>();
 
@@ -91,42 +81,32 @@ public class UcwarePhonebookClient
   {
     LOGGER.debug("newUserPhonebook()");
 
-    UcwareRequest request
-      = new UcwareRequest("newPhonebook",
-        new Object[]
-        {
-          new UcwareParamPhonebook(null, name, writable)
-        });
+    UcwarePhonebookResponse response = postRequest(
+      "newPhonebook",
+      new Object[]
+      {
+        new UcwareParamPhonebook(null, name, writable)
+      },
+      UcwarePhonebookResponse.class);
 
-    UcwarePhonebookResponse response = target.path("/user/phonebook").
-      request(
-        MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwarePhonebookResponse.class);
-
-    return response.getPhonebook();
+    return (response != null && response.getPhonebook() != null)
+      ? response.getPhonebook() : null;
   }
 
   public UcwarePhonebook updateUserPhonebook(String uuid, boolean writable)
   {
     LOGGER.debug("updateUserPhonebook({},{})", uuid, writable);
 
-    UcwareRequest request
-      = new UcwareRequest("updatePhonebook",
-        new Object[]
-        {
-          new UcwareParamPhonebook(uuid, null, writable)
-        });
+    UcwarePhonebookResponse response = postRequest(
+      "updatePhonebook",
+      new Object[]
+      {
+        new UcwareParamPhonebook(uuid, null, writable)
+      },
+      UcwarePhonebookResponse.class);
 
-    UcwarePhonebookResponse response = target.path("/user/phonebook").
-      request(
-        MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwarePhonebookResponse.class);
-
-    LOGGER.info("response={}", response);
-
-    return response.getPhonebook();
+    return (response != null && response.getPhonebook() != null)
+      ? response.getPhonebook() : null;
   }
 
   public UcwareContactGroup addUserContactGroup(String phonebookUuid,
@@ -134,37 +114,29 @@ public class UcwarePhonebookClient
   {
     LOGGER.debug("addUserContactGroup");
 
-    UcwareRequest request
-      = new UcwareRequest("addContactGroup",
-        new String[]
-        {
-          phonebookUuid, name
-        });
+    UcwareContactGroupResponse response = postRequest(
+      "addContactGroup",
+      new String[]
+      {
+        phonebookUuid, name
+      },
+      UcwareContactGroupResponse.class);
 
-    UcwareContactGroupResponse response = target.path("/user/phonebook").
-      request(
-        MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwareContactGroupResponse.class);
-
-    return response.getContactGroup();
+    return (response != null && response.getContactGroup() != null)
+      ? response.getContactGroup() : null;
   }
 
   public boolean deleteUserPhonebook(String uuid)
   {
     LOGGER.debug("deleteUserPhonebook()");
 
-    UcwareRequest request
-      = new UcwareRequest("deletePhonebook",
-        new String[]
-        {
-          uuid
-        });
-
-    UcwareBooleanResponse response = target.path("/user/phonebook").request(
-      MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwareBooleanResponse.class);
+    UcwareBooleanResponse response = postRequest(
+      "deletePhonebook",
+      new String[]
+      {
+        uuid
+      },
+      UcwareBooleanResponse.class);
 
     return response != null ? response.isResult() : false;
   }
@@ -173,17 +145,13 @@ public class UcwarePhonebookClient
   {
     LOGGER.debug("deleteUserContact()");
 
-    UcwareRequest request
-      = new UcwareRequest("deleteContact",
-        new String[]
-        {
-          uuid
-        });
-
-    UcwareBooleanResponse response = target.path("/user/phonebook").request(
-      MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwareBooleanResponse.class);
+    UcwareBooleanResponse response = postRequest(
+      "deleteContact",
+      new String[]
+      {
+        uuid
+      },
+      UcwareBooleanResponse.class);
 
     return response != null ? response.isResult() : false;
   }
@@ -193,22 +161,16 @@ public class UcwarePhonebookClient
   {
     LOGGER.debug("addUserContact()");
 
-    UcwareRequest request
-      = new UcwareRequest("addContact",
-        new Object[]
-        {
-          groupUuid, contact
-        });
+    UcwareContactResponse response = postRequest(
+      "addContact",
+      new Object[]
+      {
+        groupUuid, contact
+      },
+      UcwareContactResponse.class);
 
-    UcwareContactResponse response = target.path("/user/phonebook").
-      request(
-        MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwareContactResponse.class);
-
-    LOGGER.debug("reponse={}", response);
-
-    return response.getContact();
+    return (response != null && response.getContact() != null)
+      ? response.getContact() : null;
   }
 
   public UcwareAttribute addUserContactAttribute(String contactUuid,
@@ -216,19 +178,16 @@ public class UcwarePhonebookClient
   {
     LOGGER.debug("addUserContactAttribute()");
 
-    UcwareRequest request
-      = new UcwareRequest("addAttribute",
-        new Object[]
-        {
-          contactUuid, attribute
-        });
+    UcwareAttributeResponse response = postRequest(
+      "addAttribute",
+      new Object[]
+      {
+        contactUuid, attribute
+      },
+      UcwareAttributeResponse.class);
 
-    UcwareAttributeResponse response = target.path("/user/phonebook").request(
-      MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwareAttributeResponse.class);
-
-    return response.getAttribute();
+    return (response != null && response.getAttribute() != null)
+      ? response.getAttribute() : null;
   }
 
   public UcwarePhonebook getUserPhonebookByName(String name)
@@ -253,18 +212,15 @@ public class UcwarePhonebookClient
   {
     LOGGER.debug("getUserPhonebookByUUID()");
 
-    UcwareRequest request
-      = new UcwareRequest("getPhonebook",
-        new Object[]
-        {
-          phonebookUuid
-        });
+    UcwarePhonebookResponse response = postRequest(
+      "getPhonebook",
+      new Object[]
+      {
+        phonebookUuid
+      },
+      UcwarePhonebookResponse.class);
 
-    UcwarePhonebookResponse response = target.path("/user/phonebook").request(
-      MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwarePhonebookResponse.class);
-
-    return response.getPhonebook();
+    return (response != null && response.getPhonebook() != null)
+      ? response.getPhonebook() : null;
   }
 }

@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
  */
 public class UcwareClient
 {
-  private final static Logger LOGGER = 
-    LoggerFactory.getLogger(UcwareClient.class.getName());
+  private final static Logger LOGGER
+    = LoggerFactory.getLogger(UcwareClient.class.getName());
 
   private final WebTarget target;
 
@@ -42,9 +42,14 @@ public class UcwareClient
   public <T> T postRequest(String method, Object[] param, Class<T> type)
   {
     LOGGER.debug("postRequest({}, {}, {})", method, param, type);
-    
+
     return target.request(MediaType.APPLICATION_JSON).
-      post(Entity.entity(new UcwareRequest(method, param), 
+      post(Entity.entity(new UcwareRequest(method, param),
         MediaType.APPLICATION_JSON), type);
+  }
+
+  public <T> T postRequest(String method, Class<T> type)
+  {
+    return postRequest(method, null, type);
   }
 }

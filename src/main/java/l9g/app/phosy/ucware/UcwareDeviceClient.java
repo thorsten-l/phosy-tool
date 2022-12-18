@@ -15,13 +15,9 @@
  */
 package l9g.app.phosy.ucware;
 
-import l9g.app.phosy.ucware.common.request.UcwareRequest;
 import l9g.app.phosy.ucware.device.model.UcwareDevice;
 import l9g.app.phosy.ucware.device.response.UcwareDeviceResponse;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,31 +25,28 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public class UcwareDeviceClient
+public class UcwareDeviceClient extends UcwareClient
 {
-  private final static Logger LOGGER = LoggerFactory.getLogger(UcwareDeviceClient.class.
-      getName());
-
-  private final WebTarget target;
+  private final static Logger LOGGER = LoggerFactory.getLogger(
+    UcwareDeviceClient.class.getName());
 
   public UcwareDeviceClient(WebTarget target)
   {
-    this.target = target.path("/admin/device");
+    super(target.path("/admin/device"));
   }
 
   public UcwareDevice getDevice(String mac)
   {
     LOGGER.debug("getDevice({})", mac);
-    UcwareRequest request = new UcwareRequest("getDevice", new String[]
-    {
-      mac
-    });
-        
-    UcwareDeviceResponse response = target.request(
-      MediaType.APPLICATION_JSON).
-      post(Entity.entity(request, MediaType.APPLICATION_JSON),
-        UcwareDeviceResponse.class);
-    
-    return response.getDevice();
+
+    UcwareDeviceResponse response = postRequest("getDevice",
+      new String[]
+      {
+        mac
+      },
+      UcwareDeviceResponse.class);
+
+    return (response != null && response.getDevice() != null)
+      ? response.getDevice() : null;
   }
 }
