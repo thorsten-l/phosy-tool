@@ -13,38 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.model;
+package l9g.app.phosy.ucware.common.request;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public enum UcwareAttributeType
+@Getter
+@ToString
+@JsonPropertyOrder({ "jsonrpc", "method", "params", "id" })
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class UcwareRequest
 {
-  UCW_GENERIC_TEXT(0),
-  UCW_PHONENUMBER(1),
-  UCW_FAXIMILENUMBER(2),
-  UCW_EMAIL(3),
-  UCW_HYPERLINK(4),
-  UCW_PHONENUMBER_HIGH_PRIORITY(5),
-  UCW_COMPANY(6),
-  UCW_DEPARTMENT(7),
-  UCW_POSITION(8),
-
-  LDAP_SN(1000),
-  LDAP_GIVENNAME(1001),
-  LDAP_EMPLOYEETYPE(1002),
-  LDAP_LOCALITY(1003),
-  LDAP_ACADEMIC_TITLE(1004),
-  LDAP_CN(1005);
-
-  @Getter
-  private final int value;
-
-  private UcwareAttributeType(int value)
+  public UcwareRequest(String method)
   {
-    this.value = value;
+    this.method = method;
   }
+
+  public UcwareRequest(String method, Object[] params)
+  {
+    this(method);
+    this.params = params;
+  }
+
+  private String jsonrpc = "2.0";
+
+  private String method;
+
+  private Object[] params;
+
+  private String id = "";
 }

@@ -13,29 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.request;
+package l9g.app.phosy.ucware.user.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.ToString;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
- *
  */
 @Getter
 @ToString
-@AllArgsConstructor
-public class UcwareParamContact
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UcwareUser
 {
-  private final String prefix;
+  private int id;
 
-  private final String firstname;
+  private String username;
 
-  private final String lastname;
+  private String firstname;
 
-  private final String suffix;
-  
-  private final String syncId;
+  private String lastname;
+
+  private String email;
+
+  private String url;
+
+  private String language;
+
+  private String authBackend;
+
+  private int group_id;
+
+  private boolean privacy;
+
+  private String externalId;
+
+  private String[] slots;
+
+  private UcwareUserCallBarring[] callBarring;
+
+  private String[] clipNumbersExternal;
+
+  private String[] clipNumbersInternal;
+
+  private String[] groups;
+
+  private String[] extensions;
+
+  private String[] pickupGroups;
+
+  private String[] licenses;
 }

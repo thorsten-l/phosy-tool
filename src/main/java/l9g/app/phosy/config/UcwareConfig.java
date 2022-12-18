@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Thorsten Ludewig (t.ludewig@gmail.com)
+ * Copyright 2022 Thorsten Ludewig (t.ludewig@gmail.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.response;
+package l9g.app.phosy.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareErrorResponse
+@Setter
+public class UcwareConfig
 {
-  private int code;
+  private UcwareHost ucwareHost;
 
-  private String message;
+  private Credentials credentials;
 }

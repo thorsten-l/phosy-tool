@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy;
+package l9g.app.phosy.ucware.phonebook;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
 import com.unboundid.ldap.sdk.DN;
@@ -25,8 +25,11 @@ import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchScope;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import l9g.app.phosy.config.Configuration;
+import l9g.app.phosy.App;
+import l9g.app.phosy.ldap.ConnectionHandler;
+import l9g.app.phosy.config.LdapConfig;
 import l9g.app.phosy.config.LdapUcwareType;
+import l9g.app.phosy.config.PhonebookConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Getter;
@@ -35,18 +38,18 @@ import lombok.Getter;
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public class LdapHandler
+public class PhonebookLdapHandler
 {
   private final static Logger LOGGER
-    = LoggerFactory.getLogger(LdapHandler.class.getName());
+    = LoggerFactory.getLogger(PhonebookLdapHandler.class.getName());
 
-  private final static LdapHandler SINGLETON = new LdapHandler();
+  private final static PhonebookLdapHandler SINGLETON = new PhonebookLdapHandler();
 
-  private LdapHandler()
+  private PhonebookLdapHandler()
   {
   }
 
-  public static LdapHandler getInstance()
+  public static PhonebookLdapHandler getInstance()
   {
     return SINGLETON;
   }
@@ -57,7 +60,7 @@ public class LdapHandler
 
     try
     {
-      syncId = config.getPhonebookName() + ":" + DN.normalize(entry.getDN());
+      syncId = phonebookConfig.getPhonebookName() + ":" + DN.normalize(entry.getDN());
     }
     catch (LDAPException e)
     {
@@ -73,11 +76,11 @@ public class LdapHandler
     throws Throwable
   {
     ldapEntryMap.clear();
-    String baseDn = App.getConfig().getBaseDn();
-    LDAPConnection connection = ConnectionHandler.getSourceConnection();
+    String baseDn = ldapConfig.getBaseDn();
+    LDAPConnection connection = new ConnectionHandler(ldapConfig).getConnection();
 
     String filter = new MessageFormat(
-      config.getFilter()).format(new Object[]
+      ldapConfig.getFilter()).format(new Object[]
     {
       lastSyncTimestamp.toString()
     });
@@ -88,9 +91,9 @@ public class LdapHandler
 
     if (withAttributes)
     {
-      String[] attributeNames = new String[config.getMapEntry().size()];
+      String[] attributeNames = new String[phonebookConfig.getMapEntry().size()];
       int i = 0;
-      for (LdapUcwareType luType : config.getMapEntry())
+      for (LdapUcwareType luType : phonebookConfig.getMapEntry())
       {
         attributeNames[i] = luType.getLdapName();
         LOGGER.debug("attributeName[{}] = {}", i, attributeNames[i]);
@@ -127,5 +130,9 @@ public class LdapHandler
   @Getter
   private final static HashMap<String, Entry> ldapEntryMap = new HashMap<>();
 
-  private final static Configuration config = App.getConfig();
+  private final static PhonebookConfig phonebookConfig = App.getConfig().
+    getPhonebookConfig();
+
+  private final static LdapConfig ldapConfig = App.getConfig().
+    getPhonebookConfig().getLdapConfig();
 }

@@ -13,39 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware;
+package l9g.app.phosy.ucware.phonebook.requestparam;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.unboundid.util.NotNull;
+import l9g.app.phosy.ucware.UcwareAttributeType;
+import l9g.app.phosy.ucware.phonebook.deserializer.JsonAttributeTypeDeserializer;
+import l9g.app.phosy.ucware.phonebook.serializer.JsonAttributeTypeSerializer;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
+ *
  */
 @Getter
 @ToString
-@JsonPropertyOrder({ "jsonrpc", "method", "params", "id" })
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class UcwareRequest
+@AllArgsConstructor
+public class UcwareParamAttribute
 {
-  public UcwareRequest(String method)
-  {
-    this.method = method;
-  }
+  private final String name;
 
-  public UcwareRequest(String method, Object[] params)
-  {
-    this(method);
-    this.params = params;
-  }
+  private final String value;
 
-  private String jsonrpc = "2.0";
-
-  private String method;
-
-  private Object[] params;
-
-  private String id = "";
+  @NotNull
+  @JsonSerialize(using = JsonAttributeTypeSerializer.class)
+  @JsonDeserialize(using = JsonAttributeTypeDeserializer.class)
+  private final UcwareAttributeType type;
 }

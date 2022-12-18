@@ -134,7 +134,7 @@ public class Options
   @Option(
     name = "--sync",
     aliases = "-s",
-    usage = "Sync Ucware phonebook with LDAP"
+    usage = "Sync Ucware with LDAP"
   )
   @Getter
   @Setter

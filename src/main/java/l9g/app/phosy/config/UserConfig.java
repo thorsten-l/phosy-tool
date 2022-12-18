@@ -15,11 +15,14 @@
  */
 package l9g.app.phosy.config;
 
-//~--- JDK imports ------------------------------------------------------------
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlTransient;
+import java.util.List;
+import java.util.Map;
+import l9g.app.phosy.ucware.UcwareAttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,23 +31,29 @@ import lombok.ToString;
 
 /**
  *
- * @author Thorsten Ludewig (t.ludewig@gmail.de)
+ * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-@XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Configuration
+public class UserConfig implements LdapMapConfig
 {
   @XmlAttribute
-  private String version;
+  private boolean enabled;
 
-  private String timezone;
+  private LdapConfig ldapConfig;
 
-  private UserConfig userConfig;
+  private UcwareConfig ucwareConfig;
 
-  private PhonebookConfig phonebookConfig;
+  @XmlElementWrapper(name = "attributeTypeMapping")
+  private List<LdapUcwareType> mapEntry;
+
+  @XmlElementWrapper(name = "ignoreList")
+  private List<UidEntry> uidEntry;
+
+  @XmlTransient
+  private Map<UcwareAttributeType, String> ldapMap;
 }

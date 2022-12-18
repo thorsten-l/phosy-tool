@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy;
+package l9g.app.phosy.ucware.phonebook;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVParserBuilder;
@@ -29,15 +29,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import javax.script.Bindings;
-import l9g.app.phosy.config.Configuration;
-import l9g.app.phosy.ucware.UcwareClient;
+import l9g.app.phosy.App;
+import l9g.app.phosy.Options;
+import l9g.app.phosy.config.PhonebookConfig;
+import l9g.app.phosy.ucware.UcwarePhonebookClient;
 import l9g.app.phosy.ucware.UcwareClientFactory;
-import l9g.app.phosy.ucware.phonebook.model.UcwareAttributeType;
+import l9g.app.phosy.ucware.UcwareAttributeType;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContact;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContactGroup;
 import l9g.app.phosy.ucware.phonebook.model.UcwarePhonebook;
-import l9g.app.phosy.ucware.phonebook.request.UcwareParamAttribute;
-import l9g.app.phosy.ucware.phonebook.request.UcwareParamContact;
+import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamAttribute;
+import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamContact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,8 @@ public class PhonebookHandler
 
   private PhonebookHandler()
   {
-    ucwareClient = UcwareClientFactory.getClient();
+    ucwareClient = UcwareClientFactory.getPhonebookClient(
+      App.getConfig().getPhonebookConfig().getUcwareConfig());
   }
 
   public static PhonebookHandler getInstance()
@@ -62,6 +65,7 @@ public class PhonebookHandler
     return SINGLETON;
   }
 
+  
   public static String entryValue(Entry entry, UcwareAttributeType type)
   {
     String value = "";
@@ -148,7 +152,7 @@ public class PhonebookHandler
 
     for (String syncId : ucwareContactMap.keySet())
     {
-      if (LdapHandler.getLdapEntryMap().containsKey(syncId))
+      if (PhonebookLdapHandler.getLdapEntryMap().containsKey(syncId))
       {
         LOGGER.debug("syncId={} exist", syncId);
       }
@@ -177,9 +181,9 @@ public class PhonebookHandler
       UcwareAttributeType.LDAP_GIVENNAME);
     String attributeSn = config.getLdapMap().get(UcwareAttributeType.LDAP_SN);
 
-    for (Entry entry : LdapHandler.getLdapEntryMap().values())
+    for (Entry entry : PhonebookLdapHandler.getLdapEntryMap().values())
     {
-      String syncId = LdapHandler.buildSyncId(entry);
+      String syncId = PhonebookLdapHandler.buildSyncId(entry);
 
       if (ucwareContactMap.containsKey(syncId))
       {
@@ -193,7 +197,7 @@ public class PhonebookHandler
 
       LOGGER.debug("contactGroup={}", contactGroup);
 
-      Bindings bindings = ScriptHandler.getInstance().run(entry);
+      Bindings bindings = PhonebookScriptHandler.getInstance().run(entry);
 
       String company = (String) bindings.get("company");
       String department = (String) bindings.get("department");
@@ -258,6 +262,19 @@ public class PhonebookHandler
     }
   }
 
+  public void setPhonebookWritable( boolean writable )
+  {
+    // LOGGER.info( "writable = {}", writable);
+    UcwarePhonebook vpb = ucwareClient.updateUserPhonebook(phonebook.getUuid(), writable);
+    /*
+    LOGGER.info( "1 uuid {}", phonebook.getUuid());
+    LOGGER.info( "2 uuid {}", vpb.getUuid());
+    LOGGER.info( "1 vpb {}", vpb.isWriteable());
+    vpb = ucwareClient.getUserPhonebookByUUID(phonebook.getUuid());
+    LOGGER.info( "2 vpb {}", vpb.isWriteable());
+*/
+  }
+  
 // -----------------------------------------------------------------------  
   public void exportPhonebook(boolean backup) throws Throwable
   {
@@ -561,11 +578,11 @@ public class PhonebookHandler
     }
   }
 
-  private final static Configuration config = App.getConfig();
+  private final static PhonebookConfig config = App.getConfig().getPhonebookConfig();
 
   private final HashMap<String, UcwareContact> ucwareContactMap = new HashMap<>();
 
-  private final UcwareClient ucwareClient;
+  private final UcwarePhonebookClient ucwareClient;
 
   private UcwarePhonebook phonebook;
 

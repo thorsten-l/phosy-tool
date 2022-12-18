@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy;
+package l9g.app.phosy.ucware.user;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.PrintWriter;
+import l9g.app.phosy.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,18 +27,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public class PhonebookMain
+public class UserMain
 {
   private final static Logger LOGGER
-    = LoggerFactory.getLogger(PhonebookMain.class.getName());
+    = LoggerFactory.getLogger(UserMain.class.getName());
 
   private static final String VAR_DIRECTORY_NAME = "var";
 
   private static final String TIMESTAMP_FILENAME = "lastsync.timestamp";
 
-  private final static PhonebookMain SINGLETON = new PhonebookMain();
+  private final static UserMain SINGLETON = new UserMain();
 
-  private PhonebookMain()
+  private UserMain()
   {
     if (System.getProperty("app.home") != null)
     {
@@ -62,7 +62,7 @@ public class PhonebookMain
     LOGGER.debug("timestampFile={}", timestampFile.getAbsolutePath());
   }
 
-  public static PhonebookMain getInstance()
+  public static UserMain getInstance()
   {
     return SINGLETON;
   }
@@ -93,68 +93,14 @@ public class PhonebookMain
 
   public void run(Options OPTIONS) throws Throwable
   {
-    PhonebookHandler phonebookHandler = PhonebookHandler.getInstance();
-
-    if (OPTIONS.isInfoPhonebookName())
-    {
-      phonebookHandler.showInfo();
-      System.exit(0);
-    }
-    else if (OPTIONS.isExportPhonebookUUID())
-    {
-      phonebookHandler.exportPhonebook(false);
-      System.exit(0);
-    }
-    else if (OPTIONS.isBackupPhonebookUUID())
-    {
-      phonebookHandler.exportPhonebook(true);
-      System.exit(0);
-    }
-    else if (OPTIONS.isAddPhonebookName())
-    {
-      phonebookHandler.addPhonebook();
-      System.exit(0);
-    }
-    else if (OPTIONS.isRemovePhonebookUUID())
-    {
-      phonebookHandler.deletePhonebook();
-      System.exit(0);
-    }
-    else if (OPTIONS.isImportPhonebook())
-    {
-      phonebookHandler.importPhonebook();
-      System.exit(0);
-    }
-    else if (OPTIONS.isSyncPhonebook())
-    {
-      ASN1GeneralizedTime currentTimestamp = new ASN1GeneralizedTime();
-      ASN1GeneralizedTime lastSyncTimestamp = readLastSyncTimestamp();
-
-      LdapHandler ldapHandler = LdapHandler.getInstance();
-
-      ldapHandler.readLdapEntries(new ASN1GeneralizedTime(0l), false);
-      phonebookHandler.readContacts();
-
-      phonebookHandler.removeUnknownContacts();
-      ldapHandler.readLdapEntries(lastSyncTimestamp, true);
-
-      if (!ldapHandler.getLdapEntryMap().isEmpty())
-      {
-        LOGGER.info("Create or update {} entries.",
-          ldapHandler.getLdapEntryMap().size());
-        phonebookHandler.createUpdateContacts();
-      }
-
-      try (PrintWriter out = new PrintWriter(timestampFile))
-      {
-        out.println(currentTimestamp.toString());
-      }
-      System.exit(0);
-    }
+    UserHandler userHandler = UserHandler.getInstance();
+    
+    LOGGER.debug("user={}", userHandler.getUser("th"));
+    
+    System.exit(0);
   }
 
   private final File varDirectory;
 
   private final File timestampFile;
-
 }

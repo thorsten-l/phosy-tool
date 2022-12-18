@@ -13,14 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.request;
+package l9g.app.phosy.ucware.phonebook.requestparam;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.unboundid.util.NotNull;
-import l9g.app.phosy.ucware.phonebook.model.UcwareAttributeType;
-import l9g.app.phosy.ucware.phonebook.deserializer.JsonAttributeTypeDeserializer;
-import l9g.app.phosy.ucware.phonebook.serializer.JsonAttributeTypeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -33,14 +27,15 @@ import lombok.ToString;
 @Getter
 @ToString
 @AllArgsConstructor
-public class UcwareParamAttribute
+public class UcwareParamContact
 {
-  private final String name;
+  private final String prefix;
 
-  private final String value;
+  private final String firstname;
 
-  @NotNull
-  @JsonSerialize(using = JsonAttributeTypeSerializer.class)
-  @JsonDeserialize(using = JsonAttributeTypeDeserializer.class)
-  private final UcwareAttributeType type;
+  private final String lastname;
+
+  private final String suffix;
+  
+  private final String syncId;
 }

@@ -24,5 +24,6 @@ public enum MatchType
   equals,
   contains,
   startsWith,
-  endsWith;
+  endsWith,
+  regex;
 }

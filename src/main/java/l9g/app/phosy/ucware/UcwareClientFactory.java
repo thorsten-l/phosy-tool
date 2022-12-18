@@ -15,14 +15,17 @@
  */
 package l9g.app.phosy.ucware;
 
+import java.security.cert.X509Certificate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-import l9g.app.phosy.App;
 import l9g.app.phosy.BuildProperties;
-import l9g.app.phosy.config.Configuration;
+import l9g.app.phosy.config.UcwareConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.LoggerFactory;
 
@@ -39,21 +42,92 @@ public class UcwareClientFactory
   {
   }
 
-  public static UcwareClient getClient()
+  private static Client _getClient(UcwareConfig config)
   {
-    Client client = ClientBuilder.newClient().register(
-      new BasicAuthenticator(config.getUcwareHost().getCredentials().getUid(),
-        config.getUcwareHost().getCredentials().getPassword()));
+    Client client = null;
 
-    if ("development".equals(BuildProperties.getInstance().getProfile()))
+    try
     {
-      client = client.register(new LoggingFeature(Logger.getLogger(
-        UcwareClientFactory.class.getName()), Level.INFO, null, null));
+      if (config.getUcwareHost().isIgnoreCertificate())
+      {
+        LOGGER.warn("Ignoring Ucware host certificate");
+        SSLContext sslcontext = SSLContext.getInstance("TLS");
+        sslcontext.init(null, new TrustManager[]
+        {
+          new InsecureTrustManager()
+        }, new java.security.SecureRandom());
+
+        client = ClientBuilder.newBuilder()
+          .sslContext(sslcontext)
+          .hostnameVerifier((s1, s2) -> true)
+          .build();
+      }
+      else
+      {
+        client = ClientBuilder.newClient();
+      }
+
+      client = client.register(
+        new BasicAuthenticator(config.getCredentials().getUid(),
+          config.getCredentials().getPassword()));
+
+      if ("development".equals(BuildProperties.getInstance().getProfile()))
+      {
+        client = client.register(new LoggingFeature(Logger.getLogger(
+          UcwareClientFactory.class.getName()), Level.INFO, null, null));
+      }
+    }
+    catch (Throwable t)
+    {
+      LOGGER.error("ERROR: can't create webclient: {}", t.getMessage());
+      System.exit(-1);
     }
 
-    WebTarget target = client.target(config.getUcwareHost().getApiUrl());
-    return new UcwareClient(target);
+    return client;
   }
-  
-  private final static Configuration config = App.getConfig();;
+
+  public static UcwarePhonebookClient getPhonebookClient(UcwareConfig config)
+  {
+    WebTarget target = _getClient(config)
+      .target(config.getUcwareHost().getApiUrl());
+    return new UcwarePhonebookClient(target);
+  }
+
+  public static UcwareUserClient getUserClient(UcwareConfig config)
+  {
+    WebTarget target = _getClient(config)
+      .target(config.getUcwareHost().getApiUrl());
+    return new UcwareUserClient(target);
+
+  }
+
+  public static UcwareDeviceClient getDeviceClient(UcwareConfig config)
+  {
+    WebTarget target = _getClient(config)
+      .target(config.getUcwareHost().getApiUrl());
+    return new UcwareDeviceClient(target);
+  }
+}
+
+class InsecureTrustManager implements X509TrustManager
+{
+  @Override
+  public void checkClientTrusted(X509Certificate[] chain, String authType)
+    throws java.security.cert.CertificateException
+  {
+    //
+  }
+
+  @Override
+  public void checkServerTrusted(X509Certificate[] chain, String authType)
+    throws java.security.cert.CertificateException
+  {
+    //
+  }
+
+  @Override
+  public X509Certificate[] getAcceptedIssuers()
+  {
+    return new X509Certificate[0];
+  }
 }

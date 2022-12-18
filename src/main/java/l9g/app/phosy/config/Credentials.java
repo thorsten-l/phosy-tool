@@ -37,8 +37,9 @@ import lombok.ToString;
 public class Credentials
 {
   private String uid;
+
   private String bindDN;
-  
+
   @XmlJavaTypeAdapter(l9g.app.phosy.crypto.XmlPasswordAdapter.class)
   private String password;
 }

@@ -13,26 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.config;
+package l9g.app.phosy.ldap;
 
-import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import com.unboundid.ldap.sdk.Entry;
+import l9g.app.phosy.config.LdapMapConfig;
 import l9g.app.phosy.ucware.UcwareAttributeType;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public class XmlUcwareAttributeTypeAdapter extends XmlAdapter<String, UcwareAttributeType>
+public class LdapUtil
 {
-  @Override
-  public UcwareAttributeType unmarshal(String value) throws Exception
+
+  public LdapUtil(LdapMapConfig config, Entry entry)
   {
-    return UcwareAttributeType.valueOf(value);
+    this.config = config;
+    this.entry = entry;
   }
 
-  @Override
-  public String marshal(UcwareAttributeType attributeType) throws Exception
+  public String value(UcwareAttributeType type)
   {
-    return attributeType.name();
+    String value = "";
+    String attributeName = config.getLdapMap().get(type);
+
+    if (attributeName != null)
+    {
+      String v = entry.getAttributeValue(attributeName);
+      if (v != null)
+      {
+        value = v;
+      }
+    }
+
+    return value;
   }
+
+  private final Entry entry;
+
+  private final LdapMapConfig config;
 }

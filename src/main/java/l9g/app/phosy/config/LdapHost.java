@@ -36,7 +36,8 @@ import lombok.ToString;
 public class LdapHost
 {
   private String hostname;
+
   private int port;
+
   boolean sslEnabled;
-  private Credentials credentials;
 }

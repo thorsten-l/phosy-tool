@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.response;
+package l9g.app.phosy.ucware.device.response;
 
 import l9g.app.phosy.ucware.common.response.UcwareResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import l9g.app.phosy.ucware.phonebook.model.UcwareContactGroup;
+import l9g.app.phosy.ucware.device.model.UcwareDevice;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -29,8 +29,8 @@ import lombok.ToString;
 @Getter
 @ToString(callSuper=true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareContactGroupResponse extends UcwareResponse
+public class UcwareDeviceResponse extends UcwareResponse
 {
   @JsonProperty("result")
-  private UcwareContactGroup contactGroup;
+  private UcwareDevice device;
 }

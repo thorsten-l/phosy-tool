@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.request;
+package l9g.app.phosy.ucware.user.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.ToString;
 
 /**
- *
+ * 
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
 @Getter
 @ToString
-@AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class UcwareParamPhonebook
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UcwareUserCallBarring
 {
-  private final String uuid;
-
-  private final String name;
-
-  private final boolean writeable;
+  private String pattern;
+  private String pin;
 }

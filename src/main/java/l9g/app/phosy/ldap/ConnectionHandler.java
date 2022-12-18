@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy;
+package l9g.app.phosy.ldap;
 
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionOptions;
@@ -24,7 +24,7 @@ import javax.net.ssl.SSLSocketFactory;
 import l9g.app.phosy.config.LdapHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import l9g.app.phosy.config.Configuration;
+import l9g.app.phosy.config.LdapConfig;
 
 /**
  *
@@ -35,50 +35,31 @@ public class ConnectionHandler
   private final static Logger LOGGER = LoggerFactory.getLogger(
     ConnectionHandler.class.getName());
 
-  private LDAPConnection sourceConnection;
-
-  private LDAPConnection destinationConnection;
-
-  private final static ConnectionHandler SINGLETON = new ConnectionHandler();
-
-  private ConnectionHandler()
+  public ConnectionHandler(LdapConfig ldapConfig)
   {
     LOGGER.debug("ConnectionHandler()");
-    config = App.getConfig();
+    this.config = ldapConfig;
   }
 
-  public synchronized LDAPConnection _getSourceConnection() throws Throwable
-  {
-    if (sourceConnection == null)
-    {
-      sourceConnection = getConnection(config.getSourceHost());
-    }
-    return sourceConnection;
-  }
-
-  public static LDAPConnection getSourceConnection() throws Throwable
-  {
-    return SINGLETON._getSourceConnection();
-  }
-
-  private LDAPConnection getConnection(LdapHost ldapHost) throws Exception
+  public LDAPConnection getConnection() throws Exception
   {
     LDAPConnection ldapConnection;
+    LdapHost ldapHost = this.config.getLdapHost();
 
     LDAPConnectionOptions options = new LDAPConnectionOptions();
     if (ldapHost.isSslEnabled())
     {
       ldapConnection = new LDAPConnection(createSSLSocketFactory(), options,
         ldapHost.getHostname(), ldapHost.getPort(),
-        ldapHost.getCredentials().getBindDN(),
-        ldapHost.getCredentials().getPassword());
+        config.getCredentials().getBindDN(),
+        config.getCredentials().getPassword());
     }
     else
     {
       ldapConnection = new LDAPConnection(options,
         ldapHost.getHostname(), ldapHost.getPort(),
-        ldapHost.getCredentials().getBindDN(),
-        ldapHost.getCredentials().getPassword());
+        config.getCredentials().getBindDN(),
+        config.getCredentials().getPassword());
     }
     ldapConnection.setConnectionName(ldapHost.getHostname());
     return ldapConnection;
@@ -90,6 +71,6 @@ public class ConnectionHandler
     SSLUtil sslUtil = new SSLUtil(new TrustAllTrustManager());
     return sslUtil.createSSLSocketFactory();
   }
-  
-  private final Configuration config;
+
+  private final LdapConfig config;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Thorsten Ludewig (t.ludewig@gmail.com)
+ * Copyright 2022 Thorsten Ludewig (t.ludewig@gmail.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware;
+package l9g.app.phosy.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
- * 
+ *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-@Getter
+@XmlAccessorType(XmlAccessType.FIELD)
 @ToString
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareDevice
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class LdapConfig
 {
-  private int id;
+  private String baseDn;
 
-  private String identifier;
+  private LdapHost ldapHost;
 
-  private String vendorProduct;
+  private String filter;
 
-  private String location;
-
-  private String name;
-
-  private String extension;
-
-  private String ipAddress;
-
-  private String type;
+  private Credentials credentials;
 }

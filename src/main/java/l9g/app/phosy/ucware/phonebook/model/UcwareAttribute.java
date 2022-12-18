@@ -15,6 +15,7 @@
  */
 package l9g.app.phosy.ucware.phonebook.model;
 
+import l9g.app.phosy.ucware.UcwareAttributeType;
 import l9g.app.phosy.ucware.phonebook.deserializer.JsonAttributeTypeDeserializer;
 import l9g.app.phosy.ucware.phonebook.serializer.JsonAttributeTypeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

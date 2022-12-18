@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.response;
+package l9g.app.phosy.ucware.phonebook.requestparam;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -26,12 +24,12 @@ import lombok.ToString;
  */
 @Getter
 @ToString
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareResponse
+public class UcwareParamName
 {
-  private String jsonrpc;
+  public UcwareParamName(String name)
+  {
+    this.name = name;
+  }
 
-  private UcwareErrorResponse error;
-
-  private String id;
+  private final String name;
 }

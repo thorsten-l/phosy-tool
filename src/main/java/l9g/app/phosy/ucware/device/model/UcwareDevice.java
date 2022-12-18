@@ -13,23 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.request;
+package l9g.app.phosy.ucware.device.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.ToString;
 
 /**
- *
+ * 
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
 @Getter
 @ToString
-public class UcwareParamName
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UcwareDevice
 {
-  public UcwareParamName(String name)
-  {
-    this.name = name;
-  }
+  private int id;
 
-  private final String name;
+  private String identifier;
+
+  private String vendorProduct;
+
+  private String location;
+
+  private String name;
+
+  private String extension;
+
+  private String ipAddress;
+
+  private String type;
 }

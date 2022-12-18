@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Thorsten Ludewig (t.ludewig@gmail.com)
+ * Copyright 2022 Thorsten Ludewig (t.ludewig@gmail.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.response;
+package l9g.app.phosy.config;
 
-import l9g.app.phosy.ucware.common.response.UcwareResponse;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import l9g.app.phosy.ucware.phonebook.model.UcwareContactGroup;
-import lombok.Getter;
-import lombok.ToString;
+import java.util.Map;
+import l9g.app.phosy.ucware.UcwareAttributeType;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-@Getter
-@ToString(callSuper=true)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareContactGroupResponse extends UcwareResponse
+public interface LdapMapConfig
 {
-  @JsonProperty("result")
-  private UcwareContactGroup contactGroup;
+  Map<UcwareAttributeType, String> getLdapMap();
 }

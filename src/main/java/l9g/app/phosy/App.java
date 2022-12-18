@@ -15,6 +15,7 @@
  */
 package l9g.app.phosy;
 
+import l9g.app.phosy.ucware.phonebook.PhonebookMain;
 import jakarta.xml.bind.JAXB;
 import java.io.File;
 import java.io.FileReader;
@@ -25,6 +26,7 @@ import l9g.app.phosy.config.LdapUcwareType;
 import l9g.app.phosy.crypto.AES256;
 import l9g.app.phosy.crypto.AppSecretKey;
 import l9g.app.phosy.crypto.PasswordGenerator;
+import l9g.app.phosy.ucware.user.UserMain;
 import lombok.Getter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -42,7 +44,6 @@ public class App
 
   private static final String CONFIGURATION = "config"
     + File.separator + "config.xml";
-
 
   @Getter
   private final static Options OPTIONS = new Options();
@@ -77,10 +78,10 @@ public class App
         {
           LOGGER.debug("setting config");
           config = c;
-          config.setLdapMap(new HashMap<>());
-          for (LdapUcwareType type : config.getMapEntry())
+          config.getPhonebookConfig().setLdapMap(new HashMap<>());
+          for (LdapUcwareType type : config.getPhonebookConfig().getMapEntry())
           {
-            config.getLdapMap().put(
+            config.getPhonebookConfig().getLdapMap().put(
               type.getUcwareType(), type.getLdapName());
           }
         }
@@ -111,7 +112,6 @@ public class App
     }
     return config;
   }
-
 
   public static void main(String[] args) throws Throwable
   {
@@ -154,7 +154,15 @@ public class App
       System.exit(0);
     }
 
-    PhonebookMain.getInstance().run(OPTIONS);
+    if (config.getUserConfig().isEnabled())
+    {
+      UserMain.getInstance().run(OPTIONS);
+    }
+
+    if (config.getPhonebookConfig().isEnabled())
+    {
+      PhonebookMain.getInstance().run(OPTIONS);
+    }
 
     System.out.println("\nUsage: phosy-tool [options]\n");
     parser.printUsage(System.out);

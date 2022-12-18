@@ -36,5 +36,7 @@ import lombok.ToString;
 public class UcwareHost
 {
   private String apiUrl;
-  private Credentials credentials;
+
+  private boolean ignoreCertificate;
+
 }

@@ -13,24 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook.response;
+package l9g.app.phosy.ucware;
 
-import l9g.app.phosy.ucware.common.response.UcwareResponse;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import l9g.app.phosy.ucware.phonebook.model.UcwareContactGroup;
 import lombok.Getter;
-import lombok.ToString;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-@Getter
-@ToString(callSuper=true)
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareContactGroupResponse extends UcwareResponse
+public enum UcwareAttributeType
 {
-  @JsonProperty("result")
-  private UcwareContactGroup contactGroup;
+  UCW_GENERIC_TEXT(0),
+  UCW_PHONENUMBER(1),
+  UCW_FAXIMILENUMBER(2),
+  UCW_EMAIL(3),
+  UCW_HYPERLINK(4),
+  UCW_PHONENUMBER_HIGH_PRIORITY(5),
+  UCW_COMPANY(6),
+  UCW_DEPARTMENT(7),
+  UCW_POSITION(8),
+
+  LDAP_SN(1000),
+  LDAP_GIVENNAME(1001),
+  LDAP_EMPLOYEETYPE(1002),
+  LDAP_LOCALITY(1003),
+  LDAP_ACADEMIC_TITLE(1004),
+  LDAP_CN(1005),
+  LDAP_UID(1006),
+  LDAP_MAIL(1007),
+  LDAP_TELEPHONENUMBER(1008);
+
+  @Getter
+  private final int value;
+
+  private UcwareAttributeType(int value)
+  {
+    this.value = value;
+  }
 }
