@@ -3,20 +3,21 @@ import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.Entry;
 import l9g.app.phosy.LdapHandler;
 import l9g.app.phosy.PhonebookHandler;
-import l9g.app.phosy.ucware.phonebook.model.UcwareAttributeType;
+import static l9g.app.phosy.ucware.phonebook.model.UcwareAttributeType.*;
 
 // input args : Entry entry         (LDAP entry)
 
 String prefix = "";
 String suffix = "";
 String syncId = LdapHandler.buildSyncId(entry);
-String company = PhonebookHandler.entryValue(entry, UcwareAttributeType.UCW_COMPANY);
-String department = PhonebookHandler.entryValue(entry, UcwareAttributeType.UCW_DEPARTMENT);
-String hyperlink = PhonebookHandler.entryValue(entry, UcwareAttributeType.UCW_HYPERLINK);
-String position = PhonebookHandler.entryValue(entry, UcwareAttributeType.UCW_POSITION);
-String phoneNumber = PhonebookHandler.entryValue(entry, UcwareAttributeType.UCW_PHONENUMBER_HIGH_PRIORITY);
-String academicTitle = PhonebookHandler.entryValue(entry, UcwareAttributeType.LDAP_ACADEMIC_TITLE);
-String locality = PhonebookHandler.entryValue(entry, UcwareAttributeType.LDAP_LOCALITY);
+
+String company = ldapUtil.value(UCW_COMPANY);
+String department = ldapUtil.value(UCW_DEPARTMENT);
+String hyperlink = ldapUtil.value(UCW_HYPERLINK);
+String position = ldapUtil.value(UCW_POSITION);
+String phoneNumber = ldapUtil.value(UCW_PHONENUMBER_HIGH_PRIORITY);
+String academicTitle = ldapUtil.value(LDAP_ACADEMIC_TITLE);
+String locality = ldapUtil.value(LDAP_LOCALITY);
 
 department = department.toUpperCase();
 
