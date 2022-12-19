@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.phonebook;
+package l9g.app.phosy.ucware.user;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
-import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.Entry;
 import com.unboundid.ldap.sdk.LDAPConnection;
-import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchScope;
@@ -29,7 +27,9 @@ import l9g.app.phosy.App;
 import l9g.app.phosy.ldap.ConnectionHandler;
 import l9g.app.phosy.config.LdapConfig;
 import l9g.app.phosy.config.LdapUcwareType;
-import l9g.app.phosy.config.PhonebookConfig;
+import l9g.app.phosy.config.UserConfig;
+import l9g.app.phosy.ldap.LdapUtil;
+import l9g.app.phosy.ucware.UcwareAttributeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Getter;
@@ -38,37 +38,20 @@ import lombok.Getter;
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public class PhonebookLdapHandler
+public class UserLdapHandler
 {
   private final static Logger LOGGER
-    = LoggerFactory.getLogger(PhonebookLdapHandler.class.getName());
+    = LoggerFactory.getLogger(UserLdapHandler.class.getName());
 
-  private final static PhonebookLdapHandler SINGLETON = new PhonebookLdapHandler();
+  private final static UserLdapHandler SINGLETON = new UserLdapHandler();
 
-  private PhonebookLdapHandler()
+  private UserLdapHandler()
   {
   }
 
-  public static PhonebookLdapHandler getInstance()
+  public static UserLdapHandler getInstance()
   {
     return SINGLETON;
-  }
-
-  public static String buildSyncId(Entry entry)
-  {
-    String syncId = null;
-
-    try
-    {
-      syncId = phonebookConfig.getPhonebookName() + ":" + DN.normalize(entry.getDN());
-    }
-    catch (LDAPException e)
-    {
-      LOGGER.error("Build syncId failed ", e);
-      System.exit(0);
-    }
-
-    return syncId;
   }
 
   public void readLdapEntries(
@@ -77,7 +60,8 @@ public class PhonebookLdapHandler
   {
     ldapEntryMap.clear();
     String baseDn = ldapConfig.getBaseDn();
-    LDAPConnection connection = new ConnectionHandler(ldapConfig).getConnection();
+    LDAPConnection connection = new ConnectionHandler(ldapConfig).
+      getConnection();
 
     String filter = new MessageFormat(
       ldapConfig.getFilter()).format(new Object[]
@@ -89,23 +73,41 @@ public class PhonebookLdapHandler
 
     SearchRequest searchRequest;
 
+    String uidAttributeName = null;
+
+    String[] attributeNames = new String[userConfig.getMapEntry().size()];
+    int i = 0;
+    for (LdapUcwareType luType : userConfig.getMapEntry())
+    {
+      attributeNames[i] = luType.getName();
+      LOGGER.debug("attributeName[{}] = {}", i, attributeNames[i]);
+      if (luType.getType() == UcwareAttributeType.LDAP_UID)
+      {
+        uidAttributeName = luType.getName();
+      }
+      i++;
+    }
+
+    if (uidAttributeName == null)
+    {
+      LOGGER.error(
+        "ERROR: LDAP_UID must be set in config.xml <attributeTypeMapping>");
+      System.exit(-1);
+    }
+    else
+    {
+      LOGGER.debug("uidAttributeName={}", uidAttributeName);
+    }
+
     if (withAttributes)
     {
-      String[] attributeNames = new String[phonebookConfig.getMapEntry().size()];
-      int i = 0;
-      for (LdapUcwareType luType : phonebookConfig.getMapEntry())
-      {
-        attributeNames[i] = luType.getName();
-        LOGGER.debug("attributeName[{}] = {}", i, attributeNames[i]);
-        i++;
-      }
-
       searchRequest = new SearchRequest(baseDn, SearchScope.SUB, filter,
         attributeNames);
     }
     else
     {
-      searchRequest = new SearchRequest(baseDn, SearchScope.SUB, filter, "dn");
+      searchRequest = new SearchRequest(baseDn, SearchScope.SUB, filter,
+        uidAttributeName);
     }
 
     SearchResult sourceSearchResult = connection.search(searchRequest);
@@ -118,7 +120,10 @@ public class PhonebookLdapHandler
 
       for (Entry entry : sourceSearchResult.getSearchEntries())
       {
-        ldapEntryMap.put(buildSyncId(entry), entry);
+        LdapUtil ldapUtil = new LdapUtil(userConfig, entry);
+        ldapEntryMap.put(
+          ldapUtil.value(UcwareAttributeType.LDAP_UID).trim().toLowerCase(), 
+          entry);
       }
     }
     else
@@ -127,12 +132,16 @@ public class PhonebookLdapHandler
     }
   }
 
+  public void readAllLdapEntryUIDs() throws Throwable
+  {
+    readLdapEntries(new ASN1GeneralizedTime(0), false);
+  }
+
   @Getter
-  private final static HashMap<String, Entry> ldapEntryMap = new HashMap<>();
+  private final HashMap<String, Entry> ldapEntryMap = new HashMap<>();
 
-  private final static PhonebookConfig phonebookConfig = App.getConfig().
-    getPhonebookConfig();
+  private final static UserConfig userConfig = App.getConfig().
+    getUserConfig();
 
-  private final static LdapConfig ldapConfig = App.getConfig().
-    getPhonebookConfig().getLdapConfig();
+  private final static LdapConfig ldapConfig = userConfig.getLdapConfig();
 }

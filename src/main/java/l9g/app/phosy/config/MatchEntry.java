@@ -19,6 +19,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import l9g.app.phosy.ucware.UcwareAttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,12 +36,18 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UidEntry
+public class MatchEntry
 {
+  /*
+  @XmlAttribute
+  @XmlJavaTypeAdapter(l9g.app.phosy.config.XmlUcwareAttributeTypeAdapter.class)
+  private UcwareAttributeType type;
+  */
+  
+  @XmlAttribute
+  private String value;
+
   @XmlAttribute
   @XmlJavaTypeAdapter(l9g.app.phosy.config.XmlMatchTypeAdapter.class)
   private MatchType match;
-
-  @XmlAttribute
-  private String uid;
 }

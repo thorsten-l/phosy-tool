@@ -18,6 +18,7 @@ package l9g.app.phosy.config;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlTransient;
 import java.util.List;
@@ -52,7 +53,8 @@ public class UserConfig implements LdapMapConfig
   private List<LdapUcwareType> mapEntry;
 
   @XmlElementWrapper(name = "ignoreList")
-  private List<UidEntry> uidEntry;
+  @XmlElement(name = "matchEntry")
+  private List<MatchEntry> ignoreList;
 
   @XmlTransient
   private Map<UcwareAttributeType, String> ldapMap;

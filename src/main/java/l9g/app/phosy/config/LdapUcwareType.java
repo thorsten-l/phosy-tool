@@ -40,8 +40,8 @@ public class LdapUcwareType
 {
   @XmlAttribute
   @XmlJavaTypeAdapter(l9g.app.phosy.config.XmlUcwareAttributeTypeAdapter.class)
-  private UcwareAttributeType ucwareType;
+  private UcwareAttributeType type;
 
   @XmlAttribute
-  private String ldapName;
+  private String name;
 }

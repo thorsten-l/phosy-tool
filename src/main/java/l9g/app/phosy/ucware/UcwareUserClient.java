@@ -15,9 +15,11 @@
  */
 package l9g.app.phosy.ucware;
 
+import java.util.List;
 import l9g.app.phosy.ucware.common.response.UcwareBooleanResponse;
 import javax.ws.rs.client.WebTarget;
 import l9g.app.phosy.ucware.user.model.UcwareUser;
+import l9g.app.phosy.ucware.user.response.UcwareAllUserResponse;
 import l9g.app.phosy.ucware.user.response.UcwareUserResponse;
 
 import org.slf4j.Logger;
@@ -39,6 +41,17 @@ public class UcwareUserClient extends UcwareClient
   }
 
   // -- USER -------------------------------------------------------------------
+  public List<UcwareUser> getAll()
+  {
+    LOGGER.debug("getAll()");
+
+    UcwareAllUserResponse response = postRequest("getAll",
+      UcwareAllUserResponse.class);
+
+    return (response != null && response.getUserList() != null)
+      ? response.getUserList() : null;
+  }
+  
   public UcwareUser getUser(String username)
   {
     LOGGER.debug("getUser({})", username);

@@ -28,6 +28,7 @@ import l9g.app.phosy.crypto.AppSecretKey;
 import l9g.app.phosy.crypto.PasswordGenerator;
 import l9g.app.phosy.ucware.user.UserMain;
 import lombok.Getter;
+import lombok.Setter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
@@ -78,12 +79,21 @@ public class App
         {
           LOGGER.debug("setting config");
           config = c;
+          
+          config.getUserConfig().setLdapMap(new HashMap<>());
+          for (LdapUcwareType type : config.getUserConfig().getMapEntry())
+          {
+            config.getUserConfig().getLdapMap().put(
+              type.getType(), type.getName());
+          }
+          
           config.getPhonebookConfig().setLdapMap(new HashMap<>());
           for (LdapUcwareType type : config.getPhonebookConfig().getMapEntry())
           {
             config.getPhonebookConfig().getLdapMap().put(
-              type.getUcwareType(), type.getLdapName());
+              type.getType(), type.getName());
           }
+          
         }
       }
       else
@@ -154,6 +164,15 @@ public class App
       System.exit(0);
     }
 
+    if (OPTIONS.isDisplayHelp())
+    {
+      System.out.println("\nUsage: phosy-tool [options]\n");
+      parser.printUsage(System.out);
+      System.exit(0);
+    }
+
+    syncDone = false;
+
     if (config.getUserConfig().isEnabled())
     {
       UserMain.getInstance().run(OPTIONS);
@@ -164,10 +183,16 @@ public class App
       PhonebookMain.getInstance().run(OPTIONS);
     }
 
-    System.out.println("\nUsage: phosy-tool [options]\n");
-    parser.printUsage(System.out);
+    if (syncDone)
+    {
+      TimestampUtil.writeCurrentTimestamp();
+    }
+
     System.exit(0);
   }
+
+  @Setter
+  private static boolean syncDone;
 
   private static Configuration config;
 }

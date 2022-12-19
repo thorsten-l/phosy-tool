@@ -18,6 +18,8 @@ package l9g.app.phosy.ldap;
 import com.unboundid.ldap.sdk.Entry;
 import l9g.app.phosy.config.LdapMapConfig;
 import l9g.app.phosy.ucware.UcwareAttributeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -26,6 +28,9 @@ import l9g.app.phosy.ucware.UcwareAttributeType;
 public class LdapUtil
 {
 
+  private final static Logger LOGGER
+    = LoggerFactory.getLogger(LdapUtil.class.getName());
+  
   public LdapUtil(LdapMapConfig config, Entry entry)
   {
     this.config = config;
@@ -35,17 +40,21 @@ public class LdapUtil
   public String value(UcwareAttributeType type)
   {
     String value = "";
-    String attributeName = config.getLdapMap().get(type);
 
-    if (attributeName != null)
+    if (type != null && config != null && config.getLdapMap() != null)
     {
-      String v = entry.getAttributeValue(attributeName);
-      if (v != null)
+      String attributeName = config.getLdapMap().get(type);
+
+      if (attributeName != null)
       {
-        value = v;
+        String v = entry.getAttributeValue(attributeName);
+        if (v != null)
+        {
+          value = v;
+        }
       }
     }
-
+    
     return value;
   }
 

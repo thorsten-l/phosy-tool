@@ -16,10 +16,10 @@
 package l9g.app.phosy.ucware.user;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import com.unboundid.ldap.sdk.Entry;
+import l9g.app.phosy.App;
 import l9g.app.phosy.Options;
+import l9g.app.phosy.TimestampUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,34 +32,10 @@ public class UserMain
   private final static Logger LOGGER
     = LoggerFactory.getLogger(UserMain.class.getName());
 
-  private static final String VAR_DIRECTORY_NAME = "var";
-
-  private static final String TIMESTAMP_FILENAME = "lastsync.timestamp";
-
   private final static UserMain SINGLETON = new UserMain();
 
   private UserMain()
   {
-    if (System.getProperty("app.home") != null)
-    {
-      varDirectory = new File(System.getProperty("app.home")
-        + File.separator + VAR_DIRECTORY_NAME);
-    }
-    else
-    {
-      varDirectory = new File(VAR_DIRECTORY_NAME);
-    }
-
-    LOGGER.debug("varDirectory={}", varDirectory.getAbsolutePath());
-
-    if (!varDirectory.exists())
-    {
-      varDirectory.mkdirs();
-    }
-
-    timestampFile = new File(varDirectory, TIMESTAMP_FILENAME);
-
-    LOGGER.debug("timestampFile={}", timestampFile.getAbsolutePath());
   }
 
   public static UserMain getInstance()
@@ -67,40 +43,28 @@ public class UserMain
     return SINGLETON;
   }
 
-  private ASN1GeneralizedTime readLastSyncTimestamp() throws Throwable
-  {
-    ASN1GeneralizedTime timestamp = new ASN1GeneralizedTime(0l);
-
-    if (timestampFile.exists() && timestampFile.canRead())
-    {
-      String timestampString = null;
-
-      try (BufferedReader reader = new BufferedReader(new FileReader(
-        timestampFile)))
-      {
-        timestampString = reader.readLine().trim();
-      }
-
-      if (timestampString != null && timestampString.length() > 0)
-      {
-        timestamp = new ASN1GeneralizedTime(timestampString);
-      }
-    }
-
-    LOGGER.info("last sync timestamp = {}", timestamp);
-    return timestamp;
-  }
-
   public void run(Options OPTIONS) throws Throwable
   {
     UserHandler userHandler = UserHandler.getInstance();
-    
-    LOGGER.debug("user={}", userHandler.getUser("th"));
-    
+
+    if (OPTIONS.isSyncUsers())
+    {
+      UserLdapHandler ldapHandler = UserLdapHandler.getInstance();
+
+      userHandler.readAllUsers();
+
+      ldapHandler.readAllLdapEntryUIDs();
+      userHandler.removeUnknownUser();
+
+      ldapHandler.readLdapEntries(TimestampUtil.getLastSyncTimestamp(), true);
+      if (!ldapHandler.getLdapEntryMap().isEmpty())
+      {
+        userHandler.createUpdateUsers();
+      }
+
+      App.setSyncDone(false);
+    }
+
     System.exit(0);
   }
-
-  private final File varDirectory;
-
-  private final File timestampFile;
 }

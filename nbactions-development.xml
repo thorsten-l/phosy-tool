@@ -12,7 +12,7 @@
             <properties>
                 <exec.vmArgs></exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>-imp -f phonebook-export-dd12475e-3e61-46ca-a843-50692ac84807.json</exec.appArgs>
+                <exec.appArgs>--sync-users</exec.appArgs>
                 <exec.mainClass>l9g.app.phosy.App</exec.mainClass>
                 <exec.executable>java</exec.executable>
             </properties>
@@ -29,7 +29,7 @@
             <properties>
                 <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>-imp -f phonebook-export-dd12475e-3e61-46ca-a843-50692ac84807.json</exec.appArgs>
+                <exec.appArgs>--sync-users</exec.appArgs>
                 <exec.mainClass>l9g.app.phosy.App</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
@@ -49,7 +49,7 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>l9g.app.phosy.App</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>-imp -f phonebook-export-dd12475e-3e61-46ca-a843-50692ac84807.json</exec.appArgs>
+                <exec.appArgs>--sync-users</exec.appArgs>
             </properties>
         </action>
     </actions>

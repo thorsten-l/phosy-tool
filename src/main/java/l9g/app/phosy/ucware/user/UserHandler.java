@@ -16,10 +16,15 @@
 package l9g.app.phosy.ucware.user;
 
 import com.unboundid.ldap.sdk.Entry;
+import java.util.HashMap;
+import java.util.List;
 import l9g.app.phosy.App;
+import l9g.app.phosy.config.MatchEntry;
+import l9g.app.phosy.config.MatchType;
 import l9g.app.phosy.config.UserConfig;
+import l9g.app.phosy.ldap.LdapUtil;
 import l9g.app.phosy.ucware.UcwareClientFactory;
-import l9g.app.phosy.ucware.UcwareAttributeType;
+import static l9g.app.phosy.ucware.UcwareAttributeType.*;
 import l9g.app.phosy.ucware.UcwareUserClient;
 import l9g.app.phosy.ucware.user.model.UcwareUser;
 import org.slf4j.Logger;
@@ -33,25 +38,26 @@ public class UserHandler
 {
   private final static Logger LOGGER
     = LoggerFactory.getLogger(UserHandler.class.getName());
-  
+
   private final static UserHandler SINGLETON = new UserHandler();
-  
+
   private UserHandler()
   {
     ucwareClient = UcwareClientFactory.getUserClient(
       App.getConfig().getUserConfig().getUcwareConfig());
   }
-  
+
   public static UserHandler getInstance()
   {
     return SINGLETON;
   }
-  
+
+  /*
   public static String entryValue(Entry entry, UcwareAttributeType type)
   {
     String value = "";
     String attributeName = config.getLdapMap().get(type);
-    
+
     if (attributeName != null)
     {
       String v = entry.getAttributeValue(attributeName);
@@ -60,17 +66,132 @@ public class UserHandler
         value = v;
       }
     }
-    
+
     return value;
   }
-  
+   */
   public UcwareUser getUser(String username) throws Throwable
   {
     LOGGER.debug("getUser({})", username);
     return ucwareClient.getUser(username);
   }
-  
+
+  public void readAllUsers() throws Throwable
+  {
+    LOGGER.debug("readAllUsers");
+    ucwareUserMap.clear();
+    List<UcwareUser> userList = ucwareClient.getAll();
+    if (userList != null && !userList.isEmpty())
+    {
+      for (UcwareUser user : userList)
+      {
+        ucwareUserMap.put(user.getUsername().trim().toLowerCase(), user);
+      }
+    }
+    LOGGER.debug("{} user in ucware user map", ucwareUserMap.size());
+  }
+
+  private boolean matchIgnoreList(String value)
+  {
+    boolean match = false;
+
+    for (MatchEntry matchEntry : config.getIgnoreList())
+    {
+      String entryUid = matchEntry.getValue();
+      
+      if (matchEntry.getMatch() == MatchType.equals
+        && value.equals(entryUid))
+      {
+        match = true;
+        break;
+      }
+
+      if (matchEntry.getMatch() == MatchType.startsWith
+        && value.startsWith(entryUid))
+      {
+        match = true;
+        break;
+      }
+
+      if (matchEntry.getMatch() == MatchType.endsWith
+        && value.endsWith(entryUid))
+      {
+        match = true;
+        break;
+      }
+
+      if (matchEntry.getMatch() == MatchType.contains
+        && value.contains(entryUid))
+      {
+        match = true;
+        break;
+      }
+    }
+
+    return match;
+  }
+
+  public void removeUnknownUser() throws Throwable
+  {
+    LOGGER.debug("removeUnknownUser");
+    
+    HashMap<String, Entry> ldapEntryMap
+      = UserLdapHandler.getInstance().getLdapEntryMap();
+    
+    LOGGER.debug("ignore list={}", config.getIgnoreList());
+        
+    for (String uid : ucwareUserMap.keySet().toArray(new String[0]))
+    {
+      if (!ldapEntryMap.containsKey(uid) && !matchIgnoreList(uid))
+      {
+        LOGGER.debug( "- removing {}", uid);
+        // TODO: remove user
+      }
+    }
+  }
+
+  public void createUpdateUsers() throws Throwable
+  {
+    LOGGER.debug("createUpdateUsers");
+
+    LOGGER.debug("{}", config);
+
+    for (Entry entry : UserLdapHandler.getInstance().getLdapEntryMap().values())
+    {
+      LdapUtil ldapUtil = new LdapUtil(config, entry);
+      String uid = ldapUtil.value(LDAP_UID).trim().toLowerCase();
+
+      if (!matchIgnoreList(uid))
+      {
+        
+        if ( ucwareUserMap.containsKey(uid))
+        {
+          LOGGER.debug("* updating {} {} {}",
+          ldapUtil.value(LDAP_UID),
+          ldapUtil.value(LDAP_MAIL),
+          ldapUtil.value(LDAP_TELEPHONENUMBER));
+        }
+        else
+        {
+          LOGGER.debug("+ creating {} {} {}",
+          ldapUtil.value(LDAP_UID),
+          ldapUtil.value(LDAP_MAIL),
+          ldapUtil.value(LDAP_TELEPHONENUMBER));          
+        }
+      }
+      else
+      {
+        LOGGER.debug("# ignoring {} {} {}",
+          ldapUtil.value(LDAP_UID),
+          ldapUtil.value(LDAP_MAIL),
+          ldapUtil.value(LDAP_TELEPHONENUMBER));
+      }
+    }
+  }
+
+  private final HashMap<String, UcwareUser> ucwareUserMap = new HashMap<>();
+
   private final static UserConfig config = App.getConfig().getUserConfig();
-  
+
   private final UcwareUserClient ucwareClient;
 }

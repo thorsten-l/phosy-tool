@@ -37,7 +37,7 @@ public class Options
     if (App.getOPTIONS().getName() == null
       || App.getOPTIONS().getName().trim().length() == 0)
     {
-      LOGGER.warn("--name <phonebook name> is required");
+      LOGGER.warn("--name <name> is required");
       System.exit(0);
     }
   }
@@ -57,7 +57,7 @@ public class Options
     if (App.getOPTIONS().getUuid() == null
       || App.getOPTIONS().getUuid().trim().length() == 0)
     {
-      LOGGER.warn("--uuid <phonebook uuid> is required");
+      LOGGER.warn("--uuid <uuid> is required");
       System.exit(0);
     }
   }
@@ -70,7 +70,7 @@ public class Options
       || App.getOPTIONS().getName().trim().length() == 0))
     {
       LOGGER.warn(
-        "--uuid <phonebook uuid> OR --name <phnoebook name> is required");
+        "--uuid <uuid> OR --name <name> is required");
       System.exit(0);
     }
   }
@@ -101,7 +101,7 @@ public class Options
   @Option(
     name = "--verbose",
     aliases = "-v",
-    usage = "Detailed phonebook info"
+    usage = "Detailed info"
   )
   @Getter
   @Setter
@@ -132,13 +132,20 @@ public class Options
   private String password = null;
 
   @Option(
-    name = "--sync",
-    aliases = "-s",
-    usage = "Sync Ucware with LDAP"
+    name = "--sync-phonebook",
+    usage = "Sync Ucware user phonebook with LDAP"
   )
   @Getter
   @Setter
   private boolean syncPhonebook;
+
+  @Option(
+    name = "--sync-users",
+    usage = "Sync Ucware users with LDAP"
+  )
+  @Getter
+  @Setter
+  private boolean syncUsers;
 
   @Option(
     name = "--file",
