@@ -32,6 +32,8 @@ import l9g.app.phosy.ucware.UcwareGroupClient;
 import l9g.app.phosy.ucware.UcwareSlotClient;
 import l9g.app.phosy.ucware.UcwareUserClient;
 import l9g.app.phosy.ucware.group.model.UcwareGroup;
+import l9g.app.phosy.ucware.slot.model.UcwareSlot;
+import l9g.app.phosy.ucware.slot.requestparam.UcwareParamSlot;
 import l9g.app.phosy.ucware.user.model.UcwareUser;
 import l9g.app.phosy.ucware.user.requestparam.UcwareParamUser;
 import org.slf4j.Logger;
@@ -173,7 +175,7 @@ public class UserHandler
   public void createUpdateUsers() throws Throwable
   {
     LOGGER.debug("createUpdateUsers");
-    
+
     for (Entry entry : UserLdapHandler.getInstance().getLdapEntryMap().values())
     {
       LdapUtil ldapUtil = new LdapUtil(config, entry);
@@ -244,17 +246,61 @@ public class UserHandler
             }
 
             // assign extension (phonenumber)
-            userClient.assignExtension(
-              user.getUsername(),
-              (String) bindings.get("phoneNumber"));
+            String phoneNumber = (String) bindings.get("phoneNumber");
+
+            userClient.assignExtension(user.getUsername(), phoneNumber);
+
+            // mac Slot
+            ArrayList<String> slotTypes = (ArrayList) bindings.get("slotTypes");
+            for (String slotType : slotTypes)
+            {
+              UcwareSlot slot = null;
+
+              switch (slotType)
+              {
+                case "mac":
+                  slot = slotClient.newSlot(
+                    new UcwareParamSlot(slotType, "Tischtelefon", user.getId())
+                  );
+                  break;
+
+                case "webrtc":
+                  slot = slotClient.newSlot(
+                    new UcwareParamSlot(slotType, "UCC-Client", user.getId())
+                  );
+                  break;
+
+                case "sip-ua":
+                  slot = slotClient.newSlot(
+                    new UcwareParamSlot(slotType, "Softphone", user.getId())
+                  );
+                  break;
+
+                case "mobile":
+                  slot = slotClient.newSlot(
+                    new UcwareParamSlot(slotType, "Mobiltelefon", user.getId())
+                  );
+                  break;
+
+                case "ipei":
+                  slot = slotClient.newSlot(
+                    new UcwareParamSlot(slotType, "DECT-Telefon", user.getId())
+                  );
+                  break;
+              }
+
+              // ---------------------------------------------------------------
+              if (slot != null)
+              {
+                //
+                LOGGER.debug("slot={}", slot);
+                slotClient.assignExtension(slot.getId(), phoneNumber);
+              }
+            }
 
             user = userClient.getUser(user.getUsername());
             LOGGER.debug("user = {}", user);
 
-            
-            
-            
-            
             System.exit(0);
           }
         }

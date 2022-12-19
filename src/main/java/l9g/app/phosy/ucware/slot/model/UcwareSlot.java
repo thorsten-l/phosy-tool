@@ -39,10 +39,18 @@ public class UcwareSlot
   private String deviceExtension;
 
   private int userId;
-  
+
   private String[] extensions;
-  
+
   private int callVolume;
-  
+
   private int ringerVolume;
+
+  private String clipInternal;
+
+  private String clipExternal;
+
+  private boolean clirInternal;
+
+  private boolean clirExternal;
 }

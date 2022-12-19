@@ -18,7 +18,9 @@ package l9g.app.phosy.ucware;
 import java.util.List;
 import javax.ws.rs.client.WebTarget;
 import l9g.app.phosy.ucware.slot.model.UcwareSlot;
+import l9g.app.phosy.ucware.slot.requestparam.UcwareParamSlot;
 import l9g.app.phosy.ucware.slot.response.UcwareAllSlotsResponse;
+import l9g.app.phosy.ucware.slot.response.UcwareSlotResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,8 @@ import org.slf4j.LoggerFactory;
  */
 public class UcwareSlotClient extends UcwareClient
 {
-  private final static Logger LOGGER = LoggerFactory.getLogger(UcwareSlotClient.class.
+  private final static Logger LOGGER = LoggerFactory.getLogger(
+    UcwareSlotClient.class.
       getName());
 
   public UcwareSlotClient(WebTarget target)
@@ -47,4 +50,33 @@ public class UcwareSlotClient extends UcwareClient
 
     return response.getSlotList();
   }
+
+  public UcwareSlot newSlot(UcwareParamSlot paramSlot)
+  {
+    LOGGER.debug("newSlot({})", paramSlot);
+
+    UcwareSlotResponse response = postRequest("newSlot",
+      new Object[]
+      {
+        paramSlot
+      },
+      UcwareSlotResponse.class);
+
+    return response.getSlot();
+  }
+
+  public UcwareSlot assignExtension(int slotId, String extension)
+  {
+    LOGGER.debug("assignExtension({},{})", slotId, extension);
+
+    UcwareSlotResponse response = postRequest("assignExtension",
+      new Object[]
+      {
+        slotId, extension
+      },
+      UcwareSlotResponse.class);
+
+    return response.getSlot();
+  }
+
 }
