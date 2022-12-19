@@ -58,5 +58,5 @@ public class UcwareContact
 
   private String syncId;
 
-  private List<UcwareAttribute> attributes;
+  private List<UcwareContactAttribute> attributes;
 }

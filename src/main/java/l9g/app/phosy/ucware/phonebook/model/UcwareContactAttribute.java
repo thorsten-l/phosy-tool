@@ -36,7 +36,7 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_EMPTY)
-public class UcwareAttribute
+public class UcwareContactAttribute
 {
   @Setter
   private String uuid;

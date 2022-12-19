@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
-import l9g.app.phosy.ucware.phonebook.model.UcwareAttribute;
+import l9g.app.phosy.ucware.phonebook.model.UcwareContactAttribute;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +84,7 @@ public class JsonContactDeserializer extends StdDeserializer<UcwareContact>
 
         for (Object key : map.keySet())
         {
-          contact.getAttributes().add(objectMapper.convertValue(
-            map.get(key), UcwareAttribute.class));
+          contact.getAttributes().add(objectMapper.convertValue(map.get(key), UcwareContactAttribute.class));
         }
       }
       else if (attributesNode.getNodeType() == JsonNodeType.ARRAY)
@@ -96,8 +95,7 @@ public class JsonContactDeserializer extends StdDeserializer<UcwareContact>
         {
           for (Object object : list)
           {
-            contact.getAttributes().add(objectMapper.convertValue(
-              object, UcwareAttribute.class));
+            contact.getAttributes().add(objectMapper.convertValue(object, UcwareContactAttribute.class));
           }
         }
         else

@@ -21,7 +21,7 @@ import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.client.WebTarget;
-import l9g.app.phosy.ucware.phonebook.model.UcwareAttribute;
+import l9g.app.phosy.ucware.phonebook.model.UcwareContactAttribute;
 import l9g.app.phosy.ucware.phonebook.response.UcwareAttributeResponse;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContact;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContactGroup;
@@ -173,7 +173,7 @@ public class UcwarePhonebookClient extends UcwareClient
       ? response.getContact() : null;
   }
 
-  public UcwareAttribute addUserContactAttribute(String contactUuid,
+  public UcwareContactAttribute addUserContactAttribute(String contactUuid,
     UcwareParamAttribute attribute)
   {
     LOGGER.debug("addUserContactAttribute()");

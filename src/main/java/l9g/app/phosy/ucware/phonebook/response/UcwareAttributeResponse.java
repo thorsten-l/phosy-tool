@@ -18,7 +18,7 @@ package l9g.app.phosy.ucware.phonebook.response;
 import l9g.app.phosy.ucware.common.response.UcwareResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import l9g.app.phosy.ucware.phonebook.model.UcwareAttribute;
+import l9g.app.phosy.ucware.phonebook.model.UcwareContactAttribute;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -32,5 +32,5 @@ import lombok.ToString;
 public class UcwareAttributeResponse extends UcwareResponse
 {
   @JsonProperty("result")
-  private UcwareAttribute attribute;
+  private UcwareContactAttribute attribute;
 }
