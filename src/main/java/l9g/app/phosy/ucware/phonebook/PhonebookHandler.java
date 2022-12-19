@@ -65,7 +65,6 @@ public class PhonebookHandler
     return SINGLETON;
   }
 
-  
   public static String entryValue(Entry entry, UcwareAttributeType type)
   {
     String value = "";
@@ -263,19 +262,12 @@ public class PhonebookHandler
     }
   }
 
-  public void setPhonebookWritable( boolean writable )
+  public void setPhonebookWritable(boolean writable)
   {
-    // LOGGER.info( "writable = {}", writable);
-    UcwarePhonebook vpb = ucwareClient.updateUserPhonebook(phonebook.getUuid(), writable);
-    /*
-    LOGGER.info( "1 uuid {}", phonebook.getUuid());
-    LOGGER.info( "2 uuid {}", vpb.getUuid());
-    LOGGER.info( "1 vpb {}", vpb.isWriteable());
-    vpb = ucwareClient.getUserPhonebookByUUID(phonebook.getUuid());
-    LOGGER.info( "2 vpb {}", vpb.isWriteable());
-*/
+    UcwarePhonebook vpb = ucwareClient.updateUserPhonebook(
+      phonebook.getUuid(), writable);
   }
-  
+
 // -----------------------------------------------------------------------  
   public void exportPhonebook(boolean backup) throws Throwable
   {
@@ -579,7 +571,8 @@ public class PhonebookHandler
     }
   }
 
-  private final static PhonebookConfig config = App.getConfig().getPhonebookConfig();
+  private final static PhonebookConfig config = App.getConfig().
+    getPhonebookConfig();
 
   private final HashMap<String, UcwareContact> ucwareContactMap = new HashMap<>();
 
