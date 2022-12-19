@@ -138,40 +138,6 @@ public class UserHandler
     }
   }
 
-  /*
-  
-  # User anlegen
-        (OK, result) = adminUser.newUser(user)
-
-	# User Passwort setzen
-        (OK, result) = adminUser.setPassword(userID, password)
-
-	x = setPrivacyFlag(userID, privacy)
-
-	# Lizenz zuweisen
-        # Typ 5 = Bundle
-        (OK, lic) = adminUser.assignLicense(userID, 5)
- 
-
-        # User in Standort-Gruppe zufügen, damit er ausgehend telefonieren kann
-        (OK, result) = adminGroup.getGroupByName(UserGroup)
-
-        # Durchwahl zuweisen
-	(OK, result) = adminUser.assignExtension(userID, newExtension)
-
-	# Slot für Tischtelefon
-        (OK, result) = adminSlot.newSlot(userID, newExtension, "mac")
-
-	# Durchwahl auf Tischtelefon zuweisen
-        (OK, result) = adminSlot.assignExtensionToSlot(newExtension, slotid)
-
-        # Slot für UCC-Client
-        (OK, result) = adminSlot.newSlot(userID, newExtension, "webrtc")
-
-	# Durchwahl auf UCC-Client
-        (OK, result) = adminSlot.assignExtensionToSlot(newExtension, slotid)
-  
-   */
   public void createUpdateUsers() throws Throwable
   {
     LOGGER.debug("createUpdateUsers");
@@ -300,8 +266,6 @@ public class UserHandler
 
             user = userClient.getUser(user.getUsername());
             LOGGER.debug("user = {}", user);
-
-            System.exit(0);
           }
         }
       }
