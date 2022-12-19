@@ -15,14 +15,21 @@ String email = ldapUtil.value(UcwareAttributeType.LDAP_MAIL);
 String locality = ldapUtil.value(UcwareAttributeType.LDAP_LOCALITY);
 String externalId = DN.normalize(entry.getDN());
 ArrayList<String> groupNames = new ArrayList<>();
-ArrayList<String> licenses = new ArrayList<>();
+ArrayList<String> slotTypes = new ArrayList<>();
+ArrayList<Integer> licenses = new ArrayList<>();
 
 String url = "https://www.ostfalia.de/";
 String language = "de";
 String authBackend = "ostfalia";
 boolean privacy = true;
 
-licenses.add("5"); // bundle License
+licenses.add(5); // bundle license
+
+slotTypes.add("mac");       // table phone
+slotTypes.add("webrtc");    // software desktop client
+slotTypes.add("sip-ua");    // SIP phone
+slotTypes.add("mobile");    // mobile phone
+slotTypes.add("ipei");      // DECT phone
 
 switch (locality.toLowerCase())
 {
@@ -40,7 +47,7 @@ switch (locality.toLowerCase())
     break;
 }
 
-boolean doNotImport = false;
+boolean doNotCreate = false;
 boolean doNotUpdate = false;
 
 username;  // <= Return value
