@@ -19,6 +19,7 @@ import l9g.app.phosy.ucware.common.request.UcwareRequest;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import l9g.app.phosy.ucware.common.response.UcwareResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,17 +40,50 @@ public class UcwareClient
     this.target = target;
   }
 
-  public <T> T postRequest(String method, Object[] param, Class<T> type)
+  public <T> T postRequest(String method, Object[] param, Class<T> type,
+    boolean ignoreErrors)
   {
-    LOGGER.debug("postRequest({}, {}, {})", method, param, type);
+    LOGGER.debug("postRequest({}, {}, {})", method, param, type.getSimpleName());
 
-    return target.request(MediaType.APPLICATION_JSON).
+    T response = target.request(MediaType.APPLICATION_JSON).
       post(Entity.entity(new UcwareRequest(method, param),
         MediaType.APPLICATION_JSON), type);
+
+    if (response instanceof UcwareResponse)
+    {
+      UcwareResponse ucwareResponse = (UcwareResponse) response;
+      if (ucwareResponse != null && ucwareResponse.getError() != null)
+      {
+        LOGGER.error("ERROR: method={} param={} error={}", 
+          method, param, ucwareResponse.getError());
+        if (!ignoreErrors)
+        {
+          System.exit(-1);
+        }
+      }
+    }
+
+    if (response == null)
+    {
+      LOGGER.error("ERROR: response == null");
+      System.exit(-99);
+    }
+
+    return response;
+  }
+
+  public <T> T postRequest(String method, Object[] param, Class<T> type)
+  {
+    return postRequest(method, param, type, false);
+  }
+
+  public <T> T postRequest(String method, Class<T> type, boolean ignoreErrors)
+  {
+    return postRequest(method, null, type, ignoreErrors);
   }
 
   public <T> T postRequest(String method, Class<T> type)
   {
-    return postRequest(method, null, type);
+    return postRequest(method, null, type, false);
   }
 }
