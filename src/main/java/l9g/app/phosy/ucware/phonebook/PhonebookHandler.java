@@ -187,7 +187,7 @@ public class PhonebookHandler
       if (ucwareContactMap.containsKey(syncId))
       {
         LOGGER.info("* updating {}", entry.getDN());
-        ucwareClient.deleteUserContact(ucwareContactMap.get(syncId).getUuid());
+        // ucwareClient.deleteUserContact(ucwareContactMap.get(syncId).getUuid());
       }
       else
       {
@@ -217,6 +217,8 @@ public class PhonebookHandler
       LOGGER.debug("suffix={}", suffix);
       LOGGER.debug("locality={}", locality);
 
+      System.exit(0);
+      
       UcwareParamContact pContact = new UcwareParamContact(
         prefix,
         entry.getAttributeValue(attributeGivenName),

@@ -30,6 +30,7 @@ import l9g.app.phosy.ldap.ConnectionHandler;
 import l9g.app.phosy.config.LdapConfig;
 import l9g.app.phosy.config.LdapUcwareType;
 import l9g.app.phosy.config.PhonebookConfig;
+import l9g.app.phosy.ucware.UcwareAttributeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Getter;

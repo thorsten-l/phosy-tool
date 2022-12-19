@@ -18,6 +18,7 @@ package l9g.app.phosy.ucware.user;
 import com.unboundid.ldap.sdk.Entry;
 import java.util.HashMap;
 import java.util.List;
+import javax.script.Bindings;
 import l9g.app.phosy.App;
 import l9g.app.phosy.config.MatchEntry;
 import l9g.app.phosy.config.MatchType;
@@ -154,8 +155,8 @@ public class UserHandler
   {
     LOGGER.debug("createUpdateUsers");
 
-    LOGGER.debug("{}", config);
-
+    UserScriptHandler userScriptHandler = UserScriptHandler.getInstance();
+    
     for (Entry entry : UserLdapHandler.getInstance().getLdapEntryMap().values())
     {
       LdapUtil ldapUtil = new LdapUtil(config, entry);
@@ -163,20 +164,23 @@ public class UserHandler
 
       if (!matchIgnoreList(uid))
       {
+        Bindings bindings = userScriptHandler.run(config, entry);
         
         if ( ucwareUserMap.containsKey(uid))
         {
-          LOGGER.debug("* updating {} {} {}",
+          LOGGER.debug("* updating {} {} {} {}",
           ldapUtil.value(LDAP_UID),
           ldapUtil.value(LDAP_MAIL),
-          ldapUtil.value(LDAP_TELEPHONENUMBER));
+          ldapUtil.value(LDAP_TELEPHONENUMBER),
+          bindings.get("locality"));
         }
         else
         {
-          LOGGER.debug("+ creating {} {} {}",
+          LOGGER.debug("+ creating {} {} {} {}",
           ldapUtil.value(LDAP_UID),
           ldapUtil.value(LDAP_MAIL),
-          ldapUtil.value(LDAP_TELEPHONENUMBER));          
+          ldapUtil.value(LDAP_TELEPHONENUMBER),
+          bindings.get("locality"));          
         }
       }
       else

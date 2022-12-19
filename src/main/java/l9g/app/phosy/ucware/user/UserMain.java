@@ -64,7 +64,5 @@ public class UserMain
 
       App.setSyncDone(false);
     }
-
-    System.exit(0);
   }
 }

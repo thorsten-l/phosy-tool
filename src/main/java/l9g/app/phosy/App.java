@@ -175,11 +175,13 @@ public class App
 
     if (config.getUserConfig().isEnabled())
     {
+      LOGGER.debug( "User main enabled");
       UserMain.getInstance().run(OPTIONS);
     }
 
     if (config.getPhonebookConfig().isEnabled())
     {
+      LOGGER.debug( "Phonebook main enabled");
       PhonebookMain.getInstance().run(OPTIONS);
     }
 

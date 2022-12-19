@@ -102,7 +102,7 @@ public class PhonebookMain
       }
       
       phonebookHandler.setPhonebookWritable(false);
-      App.setSyncDone(true);
+      App.setSyncDone(false);
     }
   }
 }

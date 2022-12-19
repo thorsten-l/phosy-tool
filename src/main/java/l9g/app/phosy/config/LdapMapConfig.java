@@ -15,6 +15,7 @@
  */
 package l9g.app.phosy.config;
 
+import java.io.Serializable;
 import java.util.Map;
 import l9g.app.phosy.ucware.UcwareAttributeType;
 
@@ -22,7 +23,7 @@ import l9g.app.phosy.ucware.UcwareAttributeType;
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public interface LdapMapConfig
+public interface LdapMapConfig extends Serializable
 {
   Map<UcwareAttributeType, String> getLdapMap();
 }

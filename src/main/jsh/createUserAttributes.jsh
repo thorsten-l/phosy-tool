@@ -1,23 +1,25 @@
+
+import java.util.ArrayList;
 import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.Entry;
-import static l9g.app.phosy.ucware.UcwareAttributeType.*;
+import l9g.app.phosy.ucware.UcwareAttributeType;
 
 // input args : Entry entry        (LDAP entry)
-              : LdapUtil ldapUtil
+//            : LdapUtil ldapUtil
 
-String username = ldapUtil.value(LDAP_UID);
-String firstname = ldapUtil.value(LDAP_GIVENNAME);
-String lastname = ldapUtil.value(LDAP_SN);
-String phoneNumber = ldapUtil.value(LDAP_TELEPHONENUMBER); // extension
-String email = ldapUtil.value(LDAP_MAIL);
-String locality = ldapUtil.value(LDAP_LOCALITY);
+String username = ldapUtil.value(UcwareAttributeType.LDAP_UID);
+String firstname = ldapUtil.value(UcwareAttributeType.LDAP_GIVENNAME);
+String lastname = ldapUtil.value(UcwareAttributeType.LDAP_SN);
+String phoneNumber = ldapUtil.value(UcwareAttributeType.LDAP_TELEPHONENUMBER);
+String email = ldapUtil.value(UcwareAttributeType.LDAP_MAIL);
+String locality = ldapUtil.value(UcwareAttributeType.LDAP_LOCALITY);
 String externalId = DN.normalize(entry.getDN());
 ArrayList<String> groupNames = new ArrayList<>();
 ArrayList<String> licenses = new ArrayList<>();
 
 String url = "https://www.ostfalia.de/";
 String language = "de";
-String authBackend = "ostfalialdap";
+String authBackend = "ostfalia";
 boolean privacy = true;
 
 licenses.add("5"); // bundle License

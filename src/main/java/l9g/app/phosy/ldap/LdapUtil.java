@@ -16,26 +16,23 @@
 package l9g.app.phosy.ldap;
 
 import com.unboundid.ldap.sdk.Entry;
+import java.io.Serializable;
 import l9g.app.phosy.config.LdapMapConfig;
 import l9g.app.phosy.ucware.UcwareAttributeType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
-public class LdapUtil
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class LdapUtil implements Serializable
 {
-
-  private final static Logger LOGGER
-    = LoggerFactory.getLogger(LdapUtil.class.getName());
-  
-  public LdapUtil(LdapMapConfig config, Entry entry)
-  {
-    this.config = config;
-    this.entry = entry;
-  }
+  private static final long serialVersionUID = -5657167141755154528L;
 
   public String value(UcwareAttributeType type)
   {
@@ -54,11 +51,11 @@ public class LdapUtil
         }
       }
     }
-    
+
     return value;
   }
 
-  private final Entry entry;
+  private LdapMapConfig config;
 
-  private final LdapMapConfig config;
+  private Entry entry;
 }
