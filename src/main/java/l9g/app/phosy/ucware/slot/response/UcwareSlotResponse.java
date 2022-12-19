@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.user.response;
+package l9g.app.phosy.ucware.slot.response;
 
 import l9g.app.phosy.ucware.common.response.UcwareResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
-import l9g.app.phosy.ucware.user.model.UcwareUser;
+import l9g.app.phosy.ucware.slot.model.UcwareSlot;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -28,10 +27,10 @@ import lombok.ToString;
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
  */
 @Getter
-@ToString(callSuper=true)
+@ToString(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareAllUserResponse extends UcwareResponse
+public class UcwareSlotResponse extends UcwareResponse
 {
   @JsonProperty("result")
-  private List<UcwareUser> userList;
+  private UcwareSlot slot;
 }

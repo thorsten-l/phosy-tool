@@ -18,8 +18,11 @@ package l9g.app.phosy.ucware;
 import java.util.List;
 import l9g.app.phosy.ucware.common.response.UcwareBooleanResponse;
 import javax.ws.rs.client.WebTarget;
+import l9g.app.phosy.ucware.common.response.UcwareArrayOfIntResponse;
+import l9g.app.phosy.ucware.common.response.UcwareArrayOfStringsResponse;
 import l9g.app.phosy.ucware.user.model.UcwareUser;
-import l9g.app.phosy.ucware.user.response.UcwareAllUserResponse;
+import l9g.app.phosy.ucware.user.requestparam.UcwareParamUser;
+import l9g.app.phosy.ucware.user.response.UcwareAllUsersResponse;
 import l9g.app.phosy.ucware.user.response.UcwareUserResponse;
 
 import org.slf4j.Logger;
@@ -45,13 +48,54 @@ public class UcwareUserClient extends UcwareClient
   {
     LOGGER.debug("getAll()");
 
-    UcwareAllUserResponse response = postRequest("getAll",
-      UcwareAllUserResponse.class);
+    UcwareAllUsersResponse response = postRequest("getAll",
+      UcwareAllUsersResponse.class);
 
-    return (response != null && response.getUserList() != null)
-      ? response.getUserList() : null;
+    return response.getUserList();
   }
-  
+
+  public int[] assignLicense(String username, int license)
+  {
+    LOGGER.debug("assignLicense({},{})", username, license);
+
+    UcwareArrayOfIntResponse response = postRequest("assignLicense",
+      new Object[]
+      {
+        username, license
+      },
+      UcwareArrayOfIntResponse.class);
+
+    return response.getResult();
+  }
+
+  public String[] assignExtension(String username, String extension)
+  {
+    LOGGER.debug("assignExtension({},{})", username, extension);
+
+    UcwareArrayOfStringsResponse response = postRequest("assignExtension",
+      new Object[]
+      {
+        username, extension, true
+      },
+      UcwareArrayOfStringsResponse.class);
+
+    return response.getResult();
+  }
+
+  public UcwareUser newUser(UcwareParamUser paramUser)
+  {
+    LOGGER.debug("newUser({})", paramUser);
+
+    UcwareUserResponse response = postRequest("newUser",
+      new Object[]
+      {
+        paramUser
+      },
+      UcwareUserResponse.class);
+
+    return response.getUser();
+  }
+
   public UcwareUser getUser(String username)
   {
     LOGGER.debug("getUser({})", username);
@@ -63,8 +107,7 @@ public class UcwareUserClient extends UcwareClient
       },
       UcwareUserResponse.class);
 
-    return (response != null && response.getUser() != null)
-      ? response.getUser() : null;
+    return response.getUser();
   }
 
   public boolean setPassword(String username, String password)
@@ -78,7 +121,7 @@ public class UcwareUserClient extends UcwareClient
       },
       UcwareBooleanResponse.class);
 
-    return response != null ? response.isResult() : false;
+    return response.isResult();
   }
 
   public boolean setPin(String username, String pin)
@@ -92,7 +135,7 @@ public class UcwareUserClient extends UcwareClient
       },
       UcwareBooleanResponse.class);
 
-    return response != null ? response.isResult() : false;
+    return response.isResult();
   }
 
 }

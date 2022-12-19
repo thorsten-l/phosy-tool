@@ -101,6 +101,20 @@ public class UcwareClientFactory
 
   }
 
+  public static UcwareGroupClient getGroupClient(UcwareConfig config)
+  {
+    WebTarget target = _getClient(config)
+      .target(config.getUcwareHost().getApiUrl());
+    return new UcwareGroupClient(target);
+  }
+
+  public static UcwareSlotClient getSlotClient(UcwareConfig config)
+  {
+    WebTarget target = _getClient(config)
+      .target(config.getUcwareHost().getApiUrl());
+    return new UcwareSlotClient(target);
+  }
+
   public static UcwareDeviceClient getDeviceClient(UcwareConfig config)
   {
     WebTarget target = _getClient(config)

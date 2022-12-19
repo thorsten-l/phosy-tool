@@ -16,18 +16,24 @@
 package l9g.app.phosy.ucware.user;
 
 import com.unboundid.ldap.sdk.Entry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.script.Bindings;
 import l9g.app.phosy.App;
 import l9g.app.phosy.config.MatchEntry;
 import l9g.app.phosy.config.MatchType;
+import l9g.app.phosy.config.UcwareConfig;
 import l9g.app.phosy.config.UserConfig;
 import l9g.app.phosy.ldap.LdapUtil;
 import l9g.app.phosy.ucware.UcwareClientFactory;
 import static l9g.app.phosy.ucware.UcwareAttributeType.*;
+import l9g.app.phosy.ucware.UcwareGroupClient;
+import l9g.app.phosy.ucware.UcwareSlotClient;
 import l9g.app.phosy.ucware.UcwareUserClient;
+import l9g.app.phosy.ucware.group.model.UcwareGroup;
 import l9g.app.phosy.ucware.user.model.UcwareUser;
+import l9g.app.phosy.ucware.user.requestparam.UcwareParamUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +50,11 @@ public class UserHandler
 
   private UserHandler()
   {
-    ucwareClient = UcwareClientFactory.getUserClient(
-      App.getConfig().getUserConfig().getUcwareConfig());
+    UcwareConfig ucwareConfig
+      = App.getConfig().getUserConfig().getUcwareConfig();
+    userClient = UcwareClientFactory.getUserClient(ucwareConfig);
+    groupClient = UcwareClientFactory.getGroupClient(ucwareConfig);
+    slotClient = UcwareClientFactory.getSlotClient(ucwareConfig);
   }
 
   public static UserHandler getInstance()
@@ -53,35 +62,11 @@ public class UserHandler
     return SINGLETON;
   }
 
-  /*
-  public static String entryValue(Entry entry, UcwareAttributeType type)
-  {
-    String value = "";
-    String attributeName = config.getLdapMap().get(type);
-
-    if (attributeName != null)
-    {
-      String v = entry.getAttributeValue(attributeName);
-      if (v != null)
-      {
-        value = v;
-      }
-    }
-
-    return value;
-  }
-   */
-  public UcwareUser getUser(String username) throws Throwable
-  {
-    LOGGER.debug("getUser({})", username);
-    return ucwareClient.getUser(username);
-  }
-
   public void readAllUsers() throws Throwable
   {
     LOGGER.debug("readAllUsers");
     ucwareUserMap.clear();
-    List<UcwareUser> userList = ucwareClient.getAll();
+    List<UcwareUser> userList = userClient.getAll();
     if (userList != null && !userList.isEmpty())
     {
       for (UcwareUser user : userList)
@@ -99,7 +84,7 @@ public class UserHandler
     for (MatchEntry matchEntry : config.getIgnoreList())
     {
       String entryUid = matchEntry.getValue();
-      
+
       if (matchEntry.getMatch() == MatchType.equals
         && value.equals(entryUid))
       {
@@ -135,22 +120,56 @@ public class UserHandler
   public void removeUnknownUser() throws Throwable
   {
     LOGGER.debug("removeUnknownUser");
-    
+
     HashMap<String, Entry> ldapEntryMap
       = UserLdapHandler.getInstance().getLdapEntryMap();
-    
+
     LOGGER.debug("ignore list={}", config.getIgnoreList());
-        
+
     for (String uid : ucwareUserMap.keySet().toArray(new String[0]))
     {
       if (!ldapEntryMap.containsKey(uid) && !matchIgnoreList(uid))
       {
-        LOGGER.debug( "- removing {}", uid);
+        LOGGER.info("- removing {}", uid);
         // TODO: remove user
       }
     }
   }
 
+  /*
+  
+  # User anlegen
+        (OK, result) = adminUser.newUser(user)
+
+	# User Passwort setzen
+        (OK, result) = adminUser.setPassword(userID, password)
+
+	x = setPrivacyFlag(userID, privacy)
+
+	# Lizenz zuweisen
+        # Typ 5 = Bundle
+        (OK, lic) = adminUser.assignLicense(userID, 5)
+ 
+
+        # User in Standort-Gruppe zufügen, damit er ausgehend telefonieren kann
+        (OK, result) = adminGroup.getGroupByName(UserGroup)
+
+        # Durchwahl zuweisen
+	(OK, result) = adminUser.assignExtension(userID, newExtension)
+
+	# Slot für Tischtelefon
+        (OK, result) = adminSlot.newSlot(userID, newExtension, "mac")
+
+	# Durchwahl auf Tischtelefon zuweisen
+        (OK, result) = adminSlot.assignExtensionToSlot(newExtension, slotid)
+
+        # Slot für UCC-Client
+        (OK, result) = adminSlot.newSlot(userID, newExtension, "webrtc")
+
+	# Durchwahl auf UCC-Client
+        (OK, result) = adminSlot.assignExtensionToSlot(newExtension, slotid)
+  
+   */
   public void createUpdateUsers() throws Throwable
   {
     LOGGER.debug("createUpdateUsers");
@@ -159,31 +178,90 @@ public class UserHandler
     {
       LdapUtil ldapUtil = new LdapUtil(config, entry);
       String uid = ldapUtil.value(LDAP_UID).trim().toLowerCase();
+      Bindings bindings = UserScriptHandler.run(config, entry);
 
       if (!matchIgnoreList(uid))
       {
-        Bindings bindings = UserScriptHandler.run(config, entry);
-        
-        if ( ucwareUserMap.containsKey(uid))
+        if (ucwareUserMap.containsKey(uid))
         {
-          LOGGER.debug("* updating {} {} {} {}",
-          ldapUtil.value(LDAP_UID),
-          ldapUtil.value(LDAP_MAIL),
-          ldapUtil.value(LDAP_TELEPHONENUMBER),
-          bindings.get("locality"));
+          if (((Boolean) bindings.get("doNotUpdate")).booleanValue())
+          {
+            LOGGER.info("- not updating {} {} {} {}",
+              ldapUtil.value(LDAP_UID),
+              ldapUtil.value(LDAP_MAIL),
+              ldapUtil.value(LDAP_TELEPHONENUMBER),
+              bindings.get("locality"));
+          }
+          else
+          {
+            LOGGER.info("* updating {} {} {} {}",
+              ldapUtil.value(LDAP_UID),
+              ldapUtil.value(LDAP_MAIL),
+              ldapUtil.value(LDAP_TELEPHONENUMBER),
+              bindings.get("locality"));
+            // TODO: update user
+          }
         }
         else
         {
-          LOGGER.debug("+ creating {} {} {} {}",
-          ldapUtil.value(LDAP_UID),
-          ldapUtil.value(LDAP_MAIL),
-          ldapUtil.value(LDAP_TELEPHONENUMBER),
-          bindings.get("locality"));          
+          if (((Boolean) bindings.get("doNotCreate")).booleanValue())
+          {
+            LOGGER.info("- not creating {} {} {} {}",
+              ldapUtil.value(LDAP_UID),
+              ldapUtil.value(LDAP_MAIL),
+              ldapUtil.value(LDAP_TELEPHONENUMBER),
+              bindings.get("locality"));
+          }
+          else
+          {
+            LOGGER.info("+ creating {} {} {} {}",
+              ldapUtil.value(LDAP_UID),
+              ldapUtil.value(LDAP_MAIL),
+              ldapUtil.value(LDAP_TELEPHONENUMBER),
+              bindings.get("locality"));
+
+            // TODO: create new user
+            UcwareUser user = userClient.newUser(
+              new UcwareParamUser(bindings)
+            );
+
+            LOGGER.debug("new user = {}", user);
+
+            // assign licenses
+            ArrayList<Integer> licenses = (ArrayList) bindings.get("licenses");
+            for (int license : licenses)
+            {
+              userClient.assignLicense(user.getUsername(), license);
+            }
+
+            // assign group members
+            ArrayList<String> groupNames = (ArrayList) bindings.
+              get("groupNames");
+            for (String groupName : groupNames)
+            {
+              UcwareGroup group = groupClient.getGroupByName(groupName);
+              groupClient.assignMember(user.getId(), group.getId());
+            }
+
+            // assign extension (phonenumber)
+            userClient.assignExtension(
+              user.getUsername(),
+              (String) bindings.get("phoneNumber"));
+
+            user = userClient.getUser(user.getUsername());
+            LOGGER.debug("user = {}", user);
+
+            
+            
+            
+            
+            System.exit(0);
+          }
         }
       }
       else
       {
-        LOGGER.debug("# ignoring {} {} {}",
+        LOGGER.info("# ignoring {} {} {}",
           ldapUtil.value(LDAP_UID),
           ldapUtil.value(LDAP_MAIL),
           ldapUtil.value(LDAP_TELEPHONENUMBER));
@@ -195,5 +273,9 @@ public class UserHandler
 
   private final static UserConfig config = App.getConfig().getUserConfig();
 
-  private final UcwareUserClient ucwareClient;
+  private final UcwareUserClient userClient;
+
+  private final UcwareGroupClient groupClient;
+
+  private final UcwareSlotClient slotClient;
 }

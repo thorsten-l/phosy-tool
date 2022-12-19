@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.user.model;
+package l9g.app.phosy.ucware.group.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -26,43 +26,21 @@ import lombok.ToString;
 @Getter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareUser
+public class UcwareGroup
 {
   private int id;
 
-  private String username;
+  private String name;
 
-  private String firstname;
+  private String title;
 
-  private String lastname;
+  private String type;
 
-  private String email;
+  private int[] members;
 
-  private String url;
+  private UcwareGroupPermission[] permissions;
 
-  private String language;
+  private UcwareGroupParameter[] parameters;
 
-  private String authBackend;
-
-  private int group_id;
-
-  private boolean privacy;
-
-  private String externalId;
-
-  private String[] slots;
-
-  private UcwareUserCallBarring[] callBarring;
-
-  private String[] clipNumbersExternal;
-
-  private String[] clipNumbersInternal;
-
-  private String[] groups;
-
-  private String[] extensions;
-
-  private String[] pickupGroups;
-
-  private int[] licenses;
+  private String[] connections;
 }

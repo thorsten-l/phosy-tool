@@ -13,56 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package l9g.app.phosy.ucware.user.model;
+package l9g.app.phosy.ucware.slot.requestparam;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.ToString;
 
 /**
  *
  * @author Thorsten Ludewig (t.ludewig@gmail.com)
+ *
  */
 @Getter
 @ToString
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UcwareUser
+public class UcwareParamSlot
 {
-  private int id;
+  public UcwareParamSlot(String deviceType, String name, int userId)
+  {
+    this.deviceType = deviceType;
+    this.name = name;
+    this.userId = userId;
 
-  private String username;
+    this.clipExternal = "";
+    this.clipInternal = "";
+    this.clirExternal = false;
+    this.clirInternal = false;
 
-  private String firstname;
+    this.callVolume = 8;
+    this.ringerVolume = 8;
+  }
 
-  private String lastname;
+  private final String clipInternal;
 
-  private String email;
+  private final String clipExternal;
 
-  private String url;
+  private final boolean clirInternal;
 
-  private String language;
+  private final boolean clirExternal;
 
-  private String authBackend;
+  private final String deviceType;
 
-  private int group_id;
+  private final String name;
 
-  private boolean privacy;
+  private final int userId;
 
-  private String externalId;
+  private final int callVolume;
 
-  private String[] slots;
-
-  private UcwareUserCallBarring[] callBarring;
-
-  private String[] clipNumbersExternal;
-
-  private String[] clipNumbersInternal;
-
-  private String[] groups;
-
-  private String[] extensions;
-
-  private String[] pickupGroups;
-
-  private int[] licenses;
+  private final int ringerVolume;
 }
