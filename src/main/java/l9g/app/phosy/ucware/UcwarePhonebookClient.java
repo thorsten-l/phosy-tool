@@ -58,21 +58,10 @@ public class UcwarePhonebookClient extends UcwareClient
 
     final ArrayList<UcwarePhonebook> result = new ArrayList<>();
 
-    if (response != null)
+    response.getPhonebooks().forEach((k, v) ->
     {
-      if (response.getError() == null)
-      {
-        response.getPhonebooks().forEach((k, v) ->
-        {
-          result.add(v);
-        });
-      }
-      else
-      {
-        LOGGER.error("Error: {}", response.getError());
-        System.exit(0);
-      }
-    }
+      result.add(v);
+    });
 
     return result;
   }
@@ -89,8 +78,7 @@ public class UcwarePhonebookClient extends UcwareClient
       },
       UcwarePhonebookResponse.class);
 
-    return (response != null && response.getPhonebook() != null)
-      ? response.getPhonebook() : null;
+    return response.getPhonebook();
   }
 
   public UcwarePhonebook updateUserPhonebook(String uuid, boolean writable)
@@ -105,8 +93,7 @@ public class UcwarePhonebookClient extends UcwareClient
       },
       UcwarePhonebookResponse.class);
 
-    return (response != null && response.getPhonebook() != null)
-      ? response.getPhonebook() : null;
+    return response.getPhonebook();
   }
 
   public UcwareContactGroup addUserContactGroup(String phonebookUuid,
@@ -122,8 +109,7 @@ public class UcwarePhonebookClient extends UcwareClient
       },
       UcwareContactGroupResponse.class);
 
-    return (response != null && response.getContactGroup() != null)
-      ? response.getContactGroup() : null;
+    return response.getContactGroup();
   }
 
   public boolean deleteUserPhonebook(String uuid)
@@ -138,7 +124,7 @@ public class UcwarePhonebookClient extends UcwareClient
       },
       UcwareBooleanResponse.class);
 
-    return response != null ? response.isResult() : false;
+    return response.isResult();
   }
 
   public boolean deleteUserContact(String uuid)
@@ -153,7 +139,7 @@ public class UcwarePhonebookClient extends UcwareClient
       },
       UcwareBooleanResponse.class);
 
-    return response != null ? response.isResult() : false;
+    return response.isResult();
   }
 
   public UcwareContact addUserContact(String groupUuid,
@@ -169,8 +155,7 @@ public class UcwarePhonebookClient extends UcwareClient
       },
       UcwareContactResponse.class);
 
-    return (response != null && response.getContact() != null)
-      ? response.getContact() : null;
+    return response.getContact();
   }
 
   public UcwareContactAttribute addUserContactAttribute(String contactUuid,
@@ -186,8 +171,7 @@ public class UcwarePhonebookClient extends UcwareClient
       },
       UcwareAttributeResponse.class);
 
-    return (response != null && response.getAttribute() != null)
-      ? response.getAttribute() : null;
+    return response.getAttribute();
   }
 
   public UcwarePhonebook getUserPhonebookByName(String name)
@@ -210,7 +194,7 @@ public class UcwarePhonebookClient extends UcwareClient
 
   public UcwarePhonebook getUserPhonebookByUUID(String phonebookUuid)
   {
-    LOGGER.debug("getUserPhonebookByUUID()");
+    LOGGER.debug("getUserPhonebookByUUID({})", phonebookUuid);
 
     UcwarePhonebookResponse response = postRequest(
       "getPhonebook",
@@ -218,9 +202,8 @@ public class UcwarePhonebookClient extends UcwareClient
       {
         phonebookUuid
       },
-      UcwarePhonebookResponse.class);
+      UcwarePhonebookResponse.class, true);
 
-    return (response != null && response.getPhonebook() != null)
-      ? response.getPhonebook() : null;
+    return response.getPhonebook();
   }
 }
