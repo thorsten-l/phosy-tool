@@ -154,8 +154,6 @@ public class UserHandler
   public void createUpdateUsers() throws Throwable
   {
     LOGGER.debug("createUpdateUsers");
-
-    UserScriptHandler userScriptHandler = UserScriptHandler.getInstance();
     
     for (Entry entry : UserLdapHandler.getInstance().getLdapEntryMap().values())
     {
@@ -164,7 +162,7 @@ public class UserHandler
 
       if (!matchIgnoreList(uid))
       {
-        Bindings bindings = userScriptHandler.run(config, entry);
+        Bindings bindings = UserScriptHandler.run(config, entry);
         
         if ( ucwareUserMap.containsKey(uid))
         {

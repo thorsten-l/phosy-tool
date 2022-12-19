@@ -15,9 +15,6 @@
  */
 package l9g.app.phosy.ucware.user;
 
-import com.unboundid.asn1.ASN1GeneralizedTime;
-import com.unboundid.ldap.sdk.Entry;
-import l9g.app.phosy.App;
 import l9g.app.phosy.Options;
 import l9g.app.phosy.TimestampUtil;
 import org.slf4j.Logger;
@@ -45,6 +42,7 @@ public class UserMain
 
   public void run(Options OPTIONS) throws Throwable
   {
+    TimestampUtil timestampUtil = new TimestampUtil("users");
     UserHandler userHandler = UserHandler.getInstance();
 
     if (OPTIONS.isSyncUsers())
@@ -56,13 +54,13 @@ public class UserMain
       ldapHandler.readAllLdapEntryUIDs();
       userHandler.removeUnknownUser();
 
-      ldapHandler.readLdapEntries(TimestampUtil.getLastSyncTimestamp(), true);
+      ldapHandler.readLdapEntries(timestampUtil.getLastSyncTimestamp(), true);
       if (!ldapHandler.getLdapEntryMap().isEmpty())
       {
         userHandler.createUpdateUsers();
       }
 
-      App.setSyncDone(false);
+      timestampUtil.writeCurrentTimestamp();
     }
   }
 }

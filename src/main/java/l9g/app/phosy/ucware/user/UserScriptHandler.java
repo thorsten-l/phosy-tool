@@ -71,12 +71,7 @@ public class UserScriptHandler
     }
   }
 
-  public static UserScriptHandler getInstance()
-  {
-    return SINGLETON;
-  }
-
-  public Bindings run(LdapMapConfig mapConfig, Entry entry)
+  private Bindings _run(LdapMapConfig mapConfig, Entry entry)
     throws IOException, ScriptException, LDIFException
   {
     LdapUtil ldapUtil = new LdapUtil(mapConfig, entry);
@@ -88,4 +83,9 @@ public class UserScriptHandler
     return bindings;
   }
 
+  public static Bindings run(LdapMapConfig mapConfig, Entry entry)
+    throws IOException, ScriptException, LDIFException
+  {
+    return SINGLETON._run(mapConfig, entry);
+  }
 }

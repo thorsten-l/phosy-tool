@@ -171,8 +171,6 @@ public class App
       System.exit(0);
     }
 
-    syncDone = false;
-
     if (config.getUserConfig().isEnabled())
     {
       LOGGER.debug( "User main enabled");
@@ -185,16 +183,8 @@ public class App
       PhonebookMain.getInstance().run(OPTIONS);
     }
 
-    if (syncDone)
-    {
-      TimestampUtil.writeCurrentTimestamp();
-    }
-
     System.exit(0);
   }
-
-  @Setter
-  private static boolean syncDone;
 
   private static Configuration config;
 }

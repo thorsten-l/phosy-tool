@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,12 +38,11 @@ public class TimestampUtil
 
   private static final String VAR_DIRECTORY_NAME = "var";
 
-  private final static TimestampUtil SINGLETON = new TimestampUtil();
-
-  private TimestampUtil()
+  public TimestampUtil(String prefix)
   {
     currentTimestamp = new ASN1GeneralizedTime();
-
+    this.prefix = prefix;
+    
     if (System.getProperty("app.home") != null)
     {
       varDirectory = new File(System.getProperty("app.home")
@@ -60,7 +60,7 @@ public class TimestampUtil
       varDirectory.mkdirs();
     }
 
-    timestampFile = new File(varDirectory, TIMESTAMP_FILENAME);
+    timestampFile = new File(varDirectory, prefix + "-" + TIMESTAMP_FILENAME);
 
     LOGGER.debug("timestampFile={}", timestampFile.getAbsolutePath());
 
@@ -99,41 +99,27 @@ public class TimestampUtil
       }
     }
 
-    LOGGER.info("last sync timestamp = {}", timestamp);
+    LOGGER.info("last sync {} timestamp = {}", prefix, timestamp);
     return timestamp;
   }
 
-  private void _writeCurrentTimestamp() throws IOException
+  public void writeCurrentTimestamp() throws IOException
   {
+    LOGGER.info("Writing timestamp to {}", timestampFile.getAbsolutePath());
     try (PrintWriter out = new PrintWriter(timestampFile))
     {
       out.println(currentTimestamp.toString());
     }
   }
 
-  public static ASN1GeneralizedTime getLastSyncTimestamp()
-  {
-    return SINGLETON.lastSyncTimestamp;
-  }
-
-  public static void writeCurrentTimestamp()
-  {
-    try
-    {
-      SINGLETON._writeCurrentTimestamp();
-    }
-    catch (IOException e)
-    {
-      LOGGER.error("ERROR: Writing last timesync file", e);
-      System.exit(-1);
-    }
-  }
-
   private final ASN1GeneralizedTime currentTimestamp;
 
+  @Getter
   private final ASN1GeneralizedTime lastSyncTimestamp;
 
   private final File varDirectory;
 
   private final File timestampFile;
+
+  private final String prefix;
 }

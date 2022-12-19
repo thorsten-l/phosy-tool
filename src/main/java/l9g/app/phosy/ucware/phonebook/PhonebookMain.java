@@ -16,11 +16,6 @@
 package l9g.app.phosy.ucware.phonebook;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.PrintWriter;
-import l9g.app.phosy.App;
 import l9g.app.phosy.Options;
 import l9g.app.phosy.TimestampUtil;
 import org.slf4j.Logger;
@@ -82,8 +77,7 @@ public class PhonebookMain
     }
     else if (OPTIONS.isSyncPhonebook())
     {
-      ASN1GeneralizedTime lastSyncTimestamp 
-        = TimestampUtil.getLastSyncTimestamp();
+      TimestampUtil timestampUtil = new TimestampUtil("phonebook");
 
       PhonebookLdapHandler ldapHandler = PhonebookLdapHandler.getInstance();
 
@@ -92,7 +86,7 @@ public class PhonebookMain
 
       phonebookHandler.setPhonebookWritable(true);
       phonebookHandler.removeUnknownContacts();
-      ldapHandler.readLdapEntries(lastSyncTimestamp, true);
+      ldapHandler.readLdapEntries(timestampUtil.getLastSyncTimestamp(), true);
 
       if (!ldapHandler.getLdapEntryMap().isEmpty())
       {
@@ -102,7 +96,7 @@ public class PhonebookMain
       }
       
       phonebookHandler.setPhonebookWritable(false);
-      App.setSyncDone(false);
+      timestampUtil.writeCurrentTimestamp();
     }
   }
 }
