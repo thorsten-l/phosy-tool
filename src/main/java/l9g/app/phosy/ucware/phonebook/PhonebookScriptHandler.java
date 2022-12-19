@@ -28,6 +28,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import jdk.jshell.JShell;
+import l9g.app.phosy.config.LdapMapConfig;
+import l9g.app.phosy.ldap.LdapUtil;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -36,7 +38,8 @@ import org.slf4j.LoggerFactory;
  */
 public class PhonebookScriptHandler
 {
-  private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(PhonebookScriptHandler.class.getName());
+  private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(
+    PhonebookScriptHandler.class.getName());
 
   public final static JShell JSHELL = JShell.builder().build();
 
@@ -63,7 +66,7 @@ public class PhonebookScriptHandler
     }
     catch (FileNotFoundException | ScriptException ex)
     {
-      LOGGER.error("Script ERROR: ", ex );
+      LOGGER.error("Script ERROR: ", ex);
       System.exit(0);
     }
   }
@@ -73,13 +76,15 @@ public class PhonebookScriptHandler
     return SINGLETON;
   }
 
-  public Bindings run(Entry entry)
+  public Bindings run(LdapMapConfig mapConfig, Entry entry)
     throws IOException, ScriptException, LDIFException
   {
+    LdapUtil ldapUtil = new LdapUtil(mapConfig, entry);
     Bindings bindings = engine.createBindings();
     bindings.put("entry", entry);
+    bindings.put("ldapUtil", ldapUtil);
     Object result = compiledScript.eval(bindings);
-    LOGGER.debug("script result = {}", result );
+    LOGGER.debug("script result = {}", result);
     return bindings;
   }
 

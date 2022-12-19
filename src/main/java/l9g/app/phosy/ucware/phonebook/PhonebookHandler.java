@@ -197,7 +197,8 @@ public class PhonebookHandler
 
       LOGGER.debug("contactGroup={}", contactGroup);
 
-      Bindings bindings = PhonebookScriptHandler.getInstance().run(entry);
+      Bindings bindings = PhonebookScriptHandler.getInstance().run(
+        config, entry);
 
       String company = (String) bindings.get("company");
       String department = (String) bindings.get("department");
