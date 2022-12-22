@@ -107,6 +107,14 @@ public class Options
   @Setter
   private boolean verbose = false;
 
+  @Option(
+    name = "--debug",
+    usage = "Enable DEBUG logging"
+  )
+  @Getter
+  @Setter
+  private boolean debugLogging = false;
+
   /**
    * Field description
    */

@@ -15,6 +15,7 @@
  */
 package l9g.app.phosy.ucware.user.requestparam;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.script.Bindings;
 import lombok.Getter;
 import lombok.ToString;
@@ -28,19 +29,27 @@ import lombok.ToString;
 @ToString
 public class UcwareParamUser
 {
-  public UcwareParamUser(Bindings bindings)
+  public UcwareParamUser(Bindings bindings, 
+    String defaultAuthBackend, String defaultLanguage )
   {
-    this.username = (String)bindings.get("username");
-    this.firstname = (String)bindings.get("firstname");
-    this.lastname = (String)bindings.get("lastname");
-    this.email = (String)bindings.get("email");
-    this.url = (String)bindings.get("url");
-    this.externalId = (String)bindings.get("externalId");
-    this.language = (String)bindings.get("language");
-    this.authBackend = (String)bindings.get("authBackend");
-    this.privacy = (Boolean)bindings.get("privacy");
+    this.username = getStringValue(bindings, "username", "");
+    this.firstname = getStringValue(bindings, "firstname", "");
+    this.lastname = getStringValue(bindings, "lastname", "");
+    this.email = getStringValue(bindings, "email", "" );
+    this.url = getStringValue(bindings, "url", "" );
+    this.externalId = getStringValue(bindings, "externalId", "" );
+    this.language = getStringValue(bindings, "language", defaultLanguage );
+    this.authBackend = getStringValue(bindings, "authBackend", defaultAuthBackend);
+    this.privacy = (bindings.get("privacy") != null) ? (Boolean) bindings.get(
+      "privacy") : false;
   }
-  
+
+  private final String getStringValue(Bindings bindings, String name,
+    String defaultValue)
+  {
+    return (bindings.get(name) != null) ? (String) bindings.get(name) : defaultValue;
+  }
+
   private final String username;
 
   private final String firstname;
@@ -50,7 +59,7 @@ public class UcwareParamUser
   private final String email;
 
   private final String url;
-  
+
   private final String externalId;
 
   private final String language;

@@ -49,8 +49,14 @@ public class UserMain
     {
       UserLdapHandler ldapHandler = UserLdapHandler.getInstance();
 
+      userHandler.readIgnoreGroups();
+      
+////////////
       userHandler.readAllUsers();
-
+      userHandler.removeAllSyncedUsers();
+////////////
+      
+      userHandler.readAllUsers();
       ldapHandler.readAllLdapEntryUIDs();
       userHandler.removeUnknownUser();
 

@@ -15,6 +15,7 @@
  */
 package l9g.app.phosy;
 
+import ch.qos.logback.classic.LoggerContext;
 import l9g.app.phosy.ucware.phonebook.PhonebookMain;
 import jakarta.xml.bind.JAXB;
 import java.io.File;
@@ -28,7 +29,6 @@ import l9g.app.phosy.crypto.AppSecretKey;
 import l9g.app.phosy.crypto.PasswordGenerator;
 import l9g.app.phosy.ucware.user.UserMain;
 import lombok.Getter;
-import lombok.Setter;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.slf4j.Logger;
@@ -79,21 +79,21 @@ public class App
         {
           LOGGER.debug("setting config");
           config = c;
-          
+
           config.getUserConfig().setLdapMap(new HashMap<>());
           for (LdapUcwareType type : config.getUserConfig().getMapEntry())
           {
             config.getUserConfig().getLdapMap().put(
               type.getType(), type.getName());
           }
-          
+
           config.getPhonebookConfig().setLdapMap(new HashMap<>());
           for (LdapUcwareType type : config.getPhonebookConfig().getMapEntry())
           {
             config.getPhonebookConfig().getLdapMap().put(
               type.getType(), type.getName());
           }
-          
+
         }
       }
       else
@@ -126,7 +126,6 @@ public class App
   public static void main(String[] args) throws Throwable
   {
     CmdLineParser parser = new CmdLineParser(OPTIONS);
-    getConfig();
 
     try
     {
@@ -139,6 +138,14 @@ public class App
       System.exit(-1);
     }
 
+    LoggerContext loggerContext
+      = LogbackConfig.getInstance().initialize(
+        OPTIONS, getConfig()).getLoggerContext();
+
+    LOGGER.debug("logger context = {}", loggerContext.getName());
+
+    // LOGGER.info( LogbackConfig.getInstance().getNotificationMarker(), "Test message" );
+    
     if (OPTIONS.getGeneratePasswordLength() > 0)
     {
       AES256 cipher = new AES256(AppSecretKey.getSecret());
@@ -173,13 +180,13 @@ public class App
 
     if (config.getUserConfig().isEnabled())
     {
-      LOGGER.debug( "User main enabled");
+      LOGGER.debug("User main enabled");
       UserMain.getInstance().run(OPTIONS);
     }
 
     if (config.getPhonebookConfig().isEnabled())
     {
-      LOGGER.debug( "Phonebook main enabled");
+      LOGGER.debug("Phonebook main enabled");
       PhonebookMain.getInstance().run(OPTIONS);
     }
 

@@ -110,6 +110,20 @@ public class UcwareUserClient extends UcwareClient
     return response.getUser();
   }
 
+  public boolean deleteUser(String username)
+  {
+    LOGGER.debug("deleteUser({})", username);
+
+    UcwareBooleanResponse response = postRequest("deleteUser",
+      new String[]
+      {
+        username
+      },
+      UcwareBooleanResponse.class);
+
+    return response.isResult();
+  }
+
   public boolean setPassword(String username, String password)
   {
     LOGGER.debug("setPassword()");

@@ -18,8 +18,8 @@ package l9g.app.phosy.config;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import l9g.app.phosy.ucware.UcwareAttributeType;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,18 +36,23 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-public class MatchEntry
+public class MailConfig
 {
-  /*
   @XmlAttribute
-  @XmlJavaTypeAdapter(l9g.app.phosy.config.XmlUcwareAttributeTypeAdapter.class)
-  private UcwareAttributeType type;
-  */
-  
-  @XmlAttribute
-  private String value;
+  private boolean enabled;
+    
+  private String smtpHost;
 
-  @XmlAttribute
-  @XmlJavaTypeAdapter(l9g.app.phosy.config.XmlMatchTypeAdapter.class)
-  private MatchType match;
+  private int smtpPort;
+
+  private boolean startTLS;
+  
+  private String subject;
+  
+  private String from;
+  
+  @XmlElementWrapper(name = "receipients")
+  private List<String> to;
+
+  private Credentials credentials;
 }

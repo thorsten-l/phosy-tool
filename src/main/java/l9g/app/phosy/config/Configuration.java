@@ -47,4 +47,6 @@ public class Configuration
   private UserConfig userConfig;
 
   private PhonebookConfig phonebookConfig;
+  
+  private MailConfig mailConfig;
 }

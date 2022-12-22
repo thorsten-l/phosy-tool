@@ -64,6 +64,19 @@ public class UcwareGroupClient extends UcwareClient
     return response.getGroup();
   }
 
+  public UcwareGroup getGroupByName(String groupName, boolean ignoreErrors)
+  {
+    LOGGER.debug("getGroupByName({})", groupName);
+    UcwareGroupResponse response = postRequest("getGroupByName",
+      new Object[]
+      {
+        groupName
+      },
+      UcwareGroupResponse.class, ignoreErrors);
+
+    return response.getGroup();
+  }
+
   public int[] assignMember(int memberId, int groupId)
   {
     LOGGER.debug("assignMember({},{})", memberId, groupId);

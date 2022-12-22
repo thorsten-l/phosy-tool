@@ -21,8 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import javax.script.Bindings;
 import l9g.app.phosy.App;
-import l9g.app.phosy.config.MatchEntry;
-import l9g.app.phosy.config.MatchType;
 import l9g.app.phosy.config.UcwareConfig;
 import l9g.app.phosy.config.UserConfig;
 import l9g.app.phosy.ldap.LdapUtil;
@@ -57,6 +55,7 @@ public class UserHandler
     userClient = UcwareClientFactory.getUserClient(ucwareConfig);
     groupClient = UcwareClientFactory.getGroupClient(ucwareConfig);
     slotClient = UcwareClientFactory.getSlotClient(ucwareConfig);
+    ignoreGroupsList = new ArrayList<>();
   }
 
   public static UserHandler getInstance()
@@ -79,44 +78,31 @@ public class UserHandler
     LOGGER.debug("{} user in ucware user map", ucwareUserMap.size());
   }
 
-  private boolean matchIgnoreList(String value)
+  public void readIgnoreGroups()
   {
-    boolean match = false;
-
-    for (MatchEntry matchEntry : config.getIgnoreList())
+    try
     {
-      String entryUid = matchEntry.getValue();
-
-      if (matchEntry.getMatch() == MatchType.equals
-        && value.equals(entryUid))
-      {
-        match = true;
-        break;
-      }
-
-      if (matchEntry.getMatch() == MatchType.startsWith
-        && value.startsWith(entryUid))
-      {
-        match = true;
-        break;
-      }
-
-      if (matchEntry.getMatch() == MatchType.endsWith
-        && value.endsWith(entryUid))
-      {
-        match = true;
-        break;
-      }
-
-      if (matchEntry.getMatch() == MatchType.contains
-        && value.contains(entryUid))
-      {
-        match = true;
-        break;
-      }
+      adminsGroup = groupClient.getGroupByName("admins");
+      syncIgnoreGroup = groupClient.getGroupByName("syncignore", true);
     }
+    catch (Throwable t)
+    {
+      // 
+    }
+  }
 
-    return match;
+  private boolean saveDeleteUser(UcwareUser user)
+  {
+    boolean result = false;
+
+    return result;
+  }
+
+  private boolean saveUpdateUser(UcwareUser user, Entry entry)
+  {
+    boolean result = false;
+
+    return result;
   }
 
   public void removeUnknownUser() throws Throwable
@@ -126,14 +112,31 @@ public class UserHandler
     HashMap<String, Entry> ldapEntryMap
       = UserLdapHandler.getInstance().getLdapEntryMap();
 
-    LOGGER.debug("ignore list={}", config.getIgnoreList());
-
-    for (String uid : ucwareUserMap.keySet().toArray(new String[0]))
+    for (UcwareUser user : ucwareUserMap.values())
     {
-      if (!ldapEntryMap.containsKey(uid) && !matchIgnoreList(uid))
+      if (!ldapEntryMap.containsKey(user.getUsername().trim().toLowerCase()))
       {
-        LOGGER.info("- removing {}", uid);
+        LOGGER.info("- removing {}", user.getUsername());
         // TODO: remove user
+      }
+    }
+  }
+
+  public void removeAllSyncedUsers() throws Throwable
+  {
+    LOGGER.debug("removeAllSyncedUsers");
+
+    for (UcwareUser user : ucwareUserMap.values())
+    {
+      if (user.getExternalId() != null
+        && user.getExternalId().trim().length() > 0)
+      {
+        LOGGER.info("- removing {} = {}", user.getUsername(),
+          saveDeleteUser(user));
+      }
+      else
+      {
+        LOGGER.info("- NOT removing {}", user.getUsername());
       }
     }
   }
@@ -148,11 +151,12 @@ public class UserHandler
       String uid = ldapUtil.value(LDAP_UID).trim().toLowerCase();
       Bindings bindings = UserScriptHandler.run(config, entry);
 
-      if (!matchIgnoreList(uid))
+      if (true)     // !matchIgnoreList(uid))
       {
         if (ucwareUserMap.containsKey(uid))
         {
-          if (((Boolean) bindings.get("doNotUpdate")).booleanValue())
+          if (bindings.get("doNotUpdate") != null
+            && ((Boolean) bindings.get("doNotUpdate")).booleanValue())
           {
             LOGGER.info("- not updating {} {} {} {}",
               ldapUtil.value(LDAP_UID),
@@ -167,12 +171,14 @@ public class UserHandler
               ldapUtil.value(LDAP_MAIL),
               ldapUtil.value(LDAP_TELEPHONENUMBER),
               bindings.get("locality"));
-            // TODO: update user
+            UcwareUser user = ucwareUserMap.get(ldapUtil.value(LDAP_UID));
+            saveUpdateUser(user, entry);
           }
         }
         else
         {
-          if (((Boolean) bindings.get("doNotCreate")).booleanValue())
+          if (bindings.get("doNotCreate") != null
+            && ((Boolean) bindings.get("doNotCreate")).booleanValue())
           {
             LOGGER.info("- not creating {} {} {} {}",
               ldapUtil.value(LDAP_UID),
@@ -189,78 +195,92 @@ public class UserHandler
               bindings.get("locality"));
 
             // TODO: create new user
-            UcwareUser user = userClient.newUser(
-              new UcwareParamUser(bindings)
-            );
+            UcwareParamUser paramUser = new UcwareParamUser(
+              bindings, config.getDefaultAuthBackend(),
+              config.getDefaultLanguage());
+
+            LOGGER.debug("paramUser={}", paramUser);
+
+            UcwareUser user = userClient.newUser(paramUser);
 
             LOGGER.debug("new user = {}", user);
 
             // assign licenses
             ArrayList<Integer> licenses = (ArrayList) bindings.get("licenses");
-            for (int license : licenses)
+            if (licenses != null)
             {
-              userClient.assignLicense(user.getUsername(), license);
+              for (int license : licenses)
+              {
+                userClient.assignLicense(user.getUsername(), license);
+              }
             }
 
             // assign group members
             ArrayList<String> groupNames = (ArrayList) bindings.
               get("groupNames");
-            for (String groupName : groupNames)
+
+            if (groupNames != null)
             {
-              UcwareGroup group = groupClient.getGroupByName(groupName);
-              groupClient.assignMember(user.getId(), group.getId());
+              for (String groupName : groupNames)
+              {
+                UcwareGroup group = groupClient.getGroupByName(groupName);
+                groupClient.assignMember(user.getId(), group.getId());
+              }
             }
 
             // assign extension (phonenumber)
             String phoneNumber = (String) bindings.get("phoneNumber");
 
-            userClient.assignExtension(user.getUsername(), phoneNumber);
-
-            // mac Slot
-            ArrayList<String> slotTypes = (ArrayList) bindings.get("slotTypes");
-            for (String slotType : slotTypes)
+            if (phoneNumber != null && phoneNumber.trim().length() > 0)
             {
-              UcwareSlot slot = null;
+              userClient.assignExtension(user.getUsername(), phoneNumber);
 
-              switch (slotType)
+              // mac Slot
+              ArrayList<String> slotTypes = (ArrayList) bindings.
+                get("slotTypes");
+              for (String slotType : slotTypes)
               {
-                case "mac":
-                  slot = slotClient.newSlot(
-                    new UcwareParamSlot(slotType, "Tischtelefon", user.getId())
-                  );
-                  break;
+                UcwareSlot slot = null;
 
-                case "webrtc":
-                  slot = slotClient.newSlot(
-                    new UcwareParamSlot(slotType, "UCC-Client", user.getId())
-                  );
-                  break;
+                switch (slotType)
+                {
+                  case "mac":
+                    slot = slotClient.newSlot(
+                      new UcwareParamSlot(slotType, "Tischtelefon", user.getId())
+                    );
+                    break;
 
-                case "sip-ua":
-                  slot = slotClient.newSlot(
-                    new UcwareParamSlot(slotType, "Softphone", user.getId())
-                  );
-                  break;
+                  case "webrtc":
+                    slot = slotClient.newSlot(
+                      new UcwareParamSlot(slotType, "UCC-Client", user.getId())
+                    );
+                    break;
 
-                case "mobile":
-                  slot = slotClient.newSlot(
-                    new UcwareParamSlot(slotType, "Mobiltelefon", user.getId())
-                  );
-                  break;
+                  case "sip-ua":
+                    slot = slotClient.newSlot(
+                      new UcwareParamSlot(slotType, "Softphone", user.getId())
+                    );
+                    break;
 
-                case "ipei":
-                  slot = slotClient.newSlot(
-                    new UcwareParamSlot(slotType, "DECT-Telefon", user.getId())
-                  );
-                  break;
-              }
+                  case "mobile":
+                    slot = slotClient.newSlot(
+                      new UcwareParamSlot(slotType, "Mobiltelefon", user.getId())
+                    );
+                    break;
 
-              // ---------------------------------------------------------------
-              if (slot != null)
-              {
-                //
-                LOGGER.debug("slot={}", slot);
-                slotClient.assignExtension(slot.getId(), phoneNumber);
+                  case "ipei":
+                    slot = slotClient.newSlot(
+                      new UcwareParamSlot(slotType, "DECT-Telefon", user.getId())
+                    );
+                    break;
+                }
+
+                if (slot != null)
+                {
+                  //
+                  LOGGER.debug("slot={}", slot);
+                  slotClient.assignExtension(slot.getId(), phoneNumber);
+                }
               }
             }
 
@@ -276,8 +296,12 @@ public class UserHandler
           ldapUtil.value(LDAP_MAIL),
           ldapUtil.value(LDAP_TELEPHONENUMBER));
       }
+
+      // System.exit(0);
     }
   }
+
+  private final ArrayList<Integer> ignoreGroupsList;
 
   private final HashMap<String, UcwareUser> ucwareUserMap = new HashMap<>();
 
@@ -288,4 +312,8 @@ public class UserHandler
   private final UcwareGroupClient groupClient;
 
   private final UcwareSlotClient slotClient;
+
+  private UcwareGroup adminsGroup;
+
+  private UcwareGroup syncIgnoreGroup;
 }
