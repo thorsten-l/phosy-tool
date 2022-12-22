@@ -52,8 +52,8 @@ public class UserMain
       userHandler.readIgnoreGroups();
       
 ////////////
-      userHandler.readAllUsers();
-      userHandler.removeAllSyncedUsers();
+//      userHandler.readAllUsers();
+//      userHandler.removeAllSyncedUsers();
 ////////////
       
       userHandler.readAllUsers();
