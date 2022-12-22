@@ -115,6 +115,14 @@ public class Options
   @Setter
   private boolean debugLogging = false;
 
+  @Option(
+    name = "--dry-run",
+    usage = "Enable dry run for testing"
+  )
+  @Getter
+  @Setter
+  private boolean dryRun = false;
+
   /**
    * Field description
    */

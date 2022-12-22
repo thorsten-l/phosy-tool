@@ -58,7 +58,7 @@ public class UcwareUser
 
   private String[] clipNumbersInternal;
 
-  private String[] groups;
+  private int[] groups;
 
   private String[] extensions;
 

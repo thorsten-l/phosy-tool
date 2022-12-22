@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.script.Bindings;
 import l9g.app.phosy.App;
+import l9g.app.phosy.LogbackConfig;
 import l9g.app.phosy.config.UcwareConfig;
 import l9g.app.phosy.config.UserConfig;
 import l9g.app.phosy.ldap.LdapUtil;
@@ -36,6 +37,7 @@ import l9g.app.phosy.ucware.user.model.UcwareUser;
 import l9g.app.phosy.ucware.user.requestparam.UcwareParamUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 /**
  *
@@ -48,10 +50,16 @@ public class UserHandler
 
   private final static UserHandler SINGLETON = new UserHandler();
 
+  private final static Marker MARKER
+    = LogbackConfig.getInstance().getNotificationMarker();
+
   private UserHandler()
   {
     UcwareConfig ucwareConfig
       = App.getConfig().getUserConfig().getUcwareConfig();
+
+    dryRun = App.getOPTIONS().isDryRun();
+
     userClient = UcwareClientFactory.getUserClient(ucwareConfig);
     groupClient = UcwareClientFactory.getGroupClient(ucwareConfig);
     slotClient = UcwareClientFactory.getSlotClient(ucwareConfig);
@@ -94,7 +102,52 @@ public class UserHandler
   private boolean saveDeleteUser(UcwareUser user)
   {
     boolean result = false;
+    boolean ignore = false;
 
+    if (user.getExternalId() != null 
+      && user.getExternalId().trim().length() > 0)
+    {
+
+      if (user.getGroups() != null)
+      {
+        for (int g : user.getGroups())
+        {
+          if (g == adminsGroup.getId()
+            || ((syncIgnoreGroup != null) && g == syncIgnoreGroup.getId()))
+          {
+            ignore = true;
+            break;
+          }
+        }
+
+        if (ignore)
+        {
+          LOGGER.warn("\n{}\n{} {}\n{}",
+            user.getUsername(),
+            user.getFirstname(), user.getLastname(),
+            user.getEmail());
+          LOGGER.warn(MARKER,
+            "Ignoring DELETE user {} is in admins or syncIgnore group.",
+            user.getUsername());
+        }
+        else
+        {
+          if (dryRun)
+          {
+            LOGGER.debug("- DRYRUN: save delete user = {}", user.getUsername());
+          }
+          else
+          {
+            LOGGER.debug("- save delete user = {}", user.getUsername());
+            result = userClient.deleteUser(user.getUsername());
+          }
+        }
+      }
+    }
+    else
+    {
+      LOGGER.debug("Ignoring DELETE user {} has no external id", user.getUsername());
+    }
     return result;
   }
 
@@ -117,7 +170,7 @@ public class UserHandler
       if (!ldapEntryMap.containsKey(user.getUsername().trim().toLowerCase()))
       {
         LOGGER.info("- removing {}", user.getUsername());
-        // TODO: remove user
+        saveDeleteUser(user);
       }
     }
   }
@@ -277,7 +330,6 @@ public class UserHandler
 
                 if (slot != null)
                 {
-                  //
                   LOGGER.debug("slot={}", slot);
                   slotClient.assignExtension(slot.getId(), phoneNumber);
                 }
@@ -296,8 +348,6 @@ public class UserHandler
           ldapUtil.value(LDAP_MAIL),
           ldapUtil.value(LDAP_TELEPHONENUMBER));
       }
-
-      // System.exit(0);
     }
   }
 
@@ -312,6 +362,8 @@ public class UserHandler
   private final UcwareGroupClient groupClient;
 
   private final UcwareSlotClient slotClient;
+
+  private final boolean dryRun;
 
   private UcwareGroup adminsGroup;
 

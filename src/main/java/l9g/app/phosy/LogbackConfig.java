@@ -71,7 +71,7 @@ public class LogbackConfig
       PatternLayoutEncoder layoutEncoder = new PatternLayoutEncoder();
       layoutEncoder.setContext(loggerContext);
       layoutEncoder.setPattern(
-        "%date{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger:%line - %boldYellow(%msg) %n");
+        "%date{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger:%line - %msg %n");
       layoutEncoder.start();
 
       if (config.isEnabled())
@@ -115,7 +115,7 @@ public class LogbackConfig
     SMTPAppender appender = new SMTPAppender();
 
     CyclicBufferTracker bufferTracker = new CyclicBufferTracker();
-    bufferTracker.setBufferSize(1);
+    bufferTracker.setBufferSize(2);
 
     appender.setContext(loggerContext);
     appender.setName(name);
