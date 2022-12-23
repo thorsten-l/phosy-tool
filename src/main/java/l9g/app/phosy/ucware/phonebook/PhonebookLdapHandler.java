@@ -16,6 +16,7 @@
 package l9g.app.phosy.ucware.phonebook;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
+import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.Entry;
 import com.unboundid.ldap.sdk.LDAPConnection;
@@ -23,6 +24,7 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchScope;
+import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import l9g.app.phosy.App;
@@ -30,6 +32,7 @@ import l9g.app.phosy.ldap.ConnectionHandler;
 import l9g.app.phosy.config.LdapConfig;
 import l9g.app.phosy.config.LdapUcwareType;
 import l9g.app.phosy.config.PhonebookConfig;
+import l9g.app.phosy.ldap.LdapUtil;
 import l9g.app.phosy.ucware.UcwareAttributeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +64,8 @@ public class PhonebookLdapHandler
 
     try
     {
-      syncId = phonebookConfig.getPhonebookName() + ":" + DN.normalize(entry.getDN());
+      syncId = phonebookConfig.getPhonebookName() + ":" + DN.normalize(entry.
+        getDN());
     }
     catch (LDAPException e)
     {
@@ -78,7 +82,8 @@ public class PhonebookLdapHandler
   {
     ldapEntryMap.clear();
     String baseDn = ldapConfig.getBaseDn();
-    LDAPConnection connection = new ConnectionHandler(ldapConfig).getConnection();
+    LDAPConnection connection = new ConnectionHandler(ldapConfig).
+      getConnection();
 
     String filter = new MessageFormat(
       ldapConfig.getFilter()).format(new Object[]
@@ -109,22 +114,45 @@ public class PhonebookLdapHandler
       searchRequest = new SearchRequest(baseDn, SearchScope.SUB, filter, "dn");
     }
 
-    SearchResult sourceSearchResult = connection.search(searchRequest);
+    int totalSourceEntries = 0;
+    ASN1OctetString resumeCookie = null;
+    SimplePagedResultsControl responseControl = null;
 
-    int sourceEntries = sourceSearchResult.getEntryCount();
+    int pagedResultSize = ldapConfig.getPagedResultSize() > 0
+      ? ldapConfig.getPagedResultSize() : 1000;
 
-    if (sourceEntries > 0)
+    do
     {
-      LOGGER.info("build list from source DNs, {} entries", sourceEntries);
+      searchRequest.setControls(
+        new SimplePagedResultsControl(pagedResultSize, resumeCookie));
 
-      for (Entry entry : sourceSearchResult.getSearchEntries())
+      SearchResult sourceSearchResult = connection.search(searchRequest);
+
+      int sourceEntries = sourceSearchResult.getEntryCount();
+      totalSourceEntries += sourceEntries;
+
+      if (sourceEntries > 0)
       {
-        ldapEntryMap.put(buildSyncId(entry), entry);
+        LOGGER.debug("build list from source DNs, {} entries", sourceEntries);
+
+        for (Entry entry : sourceSearchResult.getSearchEntries())
+        {
+          ldapEntryMap.put(buildSyncId(entry), entry);
+        }
+
+        responseControl = SimplePagedResultsControl.get(sourceSearchResult);
+        resumeCookie = responseControl.getCookie();
       }
+    }
+    while (responseControl != null && responseControl.moreResultsToReturn());
+
+    if (totalSourceEntries == 0)
+    {
+      LOGGER.info("No entries to synchronize found");
     }
     else
     {
-      LOGGER.info("No entries to synchronize found");
+      LOGGER.info("build list from source DNs, {} entries", totalSourceEntries);    
     }
   }
 

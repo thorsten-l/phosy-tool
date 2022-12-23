@@ -147,11 +147,13 @@ public class UserLdapHandler
     }
     while (responseControl != null && responseControl.moreResultsToReturn());
 
-    LOGGER.info("build list from source DNs, {} entries", totalSourceEntries);
-
     if (totalSourceEntries == 0)
     {
       LOGGER.info("No entries to synchronize found");
+    }
+    else
+    {
+      LOGGER.info("build list from source DNs, {} entries", totalSourceEntries);    
     }
   }
 
