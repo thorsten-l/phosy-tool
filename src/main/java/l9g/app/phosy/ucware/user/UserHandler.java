@@ -127,18 +127,18 @@ public class UserHandler
             user.getFirstname(), user.getLastname(),
             user.getEmail());
           LOGGER.warn(MARKER,
-            "Ignoring DELETE user {} is in admins or syncIgnore group.",
+            "IGNORE: DELETE user {} is in admins or syncIgnore group.",
             user.getUsername());
         }
         else
         {
           if (dryRun)
           {
-            LOGGER.debug("- DRYRUN: save delete user = {}", user.getUsername());
+            LOGGER.info("DRYRUN: - save delete user = {}", user.getUsername());
           }
           else
           {
-            LOGGER.debug("- save delete user = {}", user.getUsername());
+            LOGGER.info("- save delete user = {}", user.getUsername());
             result = userClient.deleteUser(user.getUsername());
           }
         }
@@ -146,7 +146,7 @@ public class UserHandler
     }
     else
     {
-      LOGGER.debug("Ignoring DELETE user {} has no external id", user.
+      LOGGER.info("IGNORE: DELETE user {} has no external id", user.
         getUsername());
     }
     return result;
@@ -178,30 +178,29 @@ public class UserHandler
           user.getFirstname(), user.getLastname(),
           user.getEmail());
         LOGGER.warn(MARKER,
-          "Ignoring UPDATE user {} is in admins or syncIgnore group.",
+          "IGNORE: UPDATE user {} is in admins or syncIgnore group.",
           user.getUsername());
       }
       else
       {
         if (dryRun)
         {
-          LOGGER.debug("- DRYRUN: save update user = {}", user.getUsername());
+          LOGGER.info("DRYRUN: * save update user = {}", user.getUsername());
         }
         else
         {
-          LOGGER.debug("- save update user = {}", user.getUsername());
-       
+          LOGGER.info("* save update user = {}", user.getUsername());
+
           // TODO: user phonenumber != entry phonenumber
           // delete 
           // create
-          
           // else -> update user
         }
       }
     }
     else
     {
-      LOGGER.debug("Ignoring UPDATE user {} has no external id", user.
+      LOGGER.debug("IGNORE: UPDATE user {} has no external id", user.
         getUsername());
     }
 
@@ -247,103 +246,114 @@ public class UserHandler
   public void createUsers(
     LdapUtil ldapUtil, Bindings bindings, Entry entry) throws Throwable
   {
-    LOGGER.info("+ creating {} {} {} {}",
-      ldapUtil.value(LDAP_UID),
-      ldapUtil.value(LDAP_MAIL),
-      ldapUtil.value(LDAP_TELEPHONENUMBER),
-      bindings.get("locality"));
-
-    // TODO: create new user
-    UcwareParamUser paramUser = new UcwareParamUser(
-      bindings, config.getDefaultAuthBackend(),
-      config.getDefaultLanguage());
-
-    LOGGER.debug("paramUser={}", paramUser);
-
-    UcwareUser user = userClient.newUser(paramUser);
-
-    LOGGER.debug("new user = {}", user);
-
-    // assign licenses
-    ArrayList<Integer> licenses = (ArrayList) bindings.get("licenses");
-    if (licenses != null)
+    if (dryRun)
     {
-      for (int license : licenses)
-      {
-        userClient.assignLicense(user.getUsername(), license);
-      }
+      LOGGER.info("DRYRUN: + creating {} {} {} {}",
+        ldapUtil.value(LDAP_UID),
+        ldapUtil.value(LDAP_MAIL),
+        ldapUtil.value(LDAP_TELEPHONENUMBER),
+        bindings.get("locality"));
     }
-
-    // assign group members
-    ArrayList<String> groupNames = (ArrayList) bindings.
-      get("groupNames");
-
-    if (groupNames != null)
+    else
     {
-      for (String groupName : groupNames)
+      LOGGER.info("+ creating {} {} {} {}",
+        ldapUtil.value(LDAP_UID),
+        ldapUtil.value(LDAP_MAIL),
+        ldapUtil.value(LDAP_TELEPHONENUMBER),
+        bindings.get("locality"));
+
+      // TODO: create new user
+      UcwareParamUser paramUser = new UcwareParamUser(
+        bindings, config.getDefaultAuthBackend(),
+        config.getDefaultLanguage());
+
+      LOGGER.debug("paramUser={}", paramUser);
+
+      UcwareUser user = userClient.newUser(paramUser);
+
+      LOGGER.debug("new user = {}", user);
+
+      // assign licenses
+      ArrayList<Integer> licenses = (ArrayList) bindings.get("licenses");
+      if (licenses != null)
       {
-        UcwareGroup group = groupClient.getGroupByName(groupName);
-        groupClient.assignMember(user.getId(), group.getId());
-      }
-    }
-
-    // assign extension (phonenumber)
-    String phoneNumber = (String) bindings.get("phoneNumber");
-
-    if (phoneNumber != null && phoneNumber.trim().length() > 0)
-    {
-      userClient.assignExtension(user.getUsername(), phoneNumber);
-
-      // mac Slot
-      ArrayList<String> slotTypes = (ArrayList) bindings.
-        get("slotTypes");
-      for (String slotType : slotTypes)
-      {
-        UcwareSlot slot = null;
-
-        switch (slotType)
+        for (int license : licenses)
         {
-          case "mac":
-            slot = slotClient.newSlot(
-              new UcwareParamSlot(slotType, "Tischtelefon", user.getId())
-            );
-            break;
-
-          case "webrtc":
-            slot = slotClient.newSlot(
-              new UcwareParamSlot(slotType, "UCC-Client", user.getId())
-            );
-            break;
-
-          case "sip-ua":
-            slot = slotClient.newSlot(
-              new UcwareParamSlot(slotType, "Softphone", user.getId())
-            );
-            break;
-
-          case "mobile":
-            slot = slotClient.newSlot(
-              new UcwareParamSlot(slotType, "Mobiltelefon", user.getId())
-            );
-            break;
-
-          case "ipei":
-            slot = slotClient.newSlot(
-              new UcwareParamSlot(slotType, "DECT-Telefon", user.getId())
-            );
-            break;
-        }
-
-        if (slot != null)
-        {
-          LOGGER.debug("slot={}", slot);
-          slotClient.assignExtension(slot.getId(), phoneNumber);
+          userClient.assignLicense(user.getUsername(), license);
         }
       }
-    }
 
-    user = userClient.getUser(user.getUsername());
-    LOGGER.debug("user = {}", user);
+      // assign group members
+      ArrayList<String> groupNames = (ArrayList) bindings.
+        get("groupNames");
+
+      if (groupNames != null)
+      {
+        for (String groupName : groupNames)
+        {
+          UcwareGroup group = groupClient.getGroupByName(groupName);
+          groupClient.assignMember(user.getId(), group.getId());
+        }
+      }
+
+      // assign extension (phonenumber)
+      String phoneNumber = (String) bindings.get("phoneNumber");
+
+      if (phoneNumber != null && phoneNumber.trim().length() > 0)
+      {
+        userClient.assignExtension(user.getUsername(), phoneNumber);
+
+        // mac Slot
+        ArrayList<String> slotTypes = (ArrayList) bindings.
+          get("slotTypes");
+        for (String slotType : slotTypes)
+        {
+          UcwareSlot slot = null;
+
+          switch (slotType)
+          {
+            case "mac":
+              slot = slotClient.newSlot(
+                new UcwareParamSlot(slotType, "Tischtelefon", user.getId())
+              );
+              break;
+
+            case "webrtc":
+              slot = slotClient.newSlot(
+                new UcwareParamSlot(slotType, "UCC-Client", user.getId())
+              );
+              break;
+
+            case "sip-ua":
+              slot = slotClient.newSlot(
+                new UcwareParamSlot(slotType, "Softphone", user.getId())
+              );
+              break;
+
+            case "mobile":
+              slot = slotClient.newSlot(
+                new UcwareParamSlot(slotType, "Mobiltelefon", user.getId())
+              );
+              break;
+
+            case "ipei":
+              slot = slotClient.newSlot(
+                new UcwareParamSlot(slotType, "DECT-Telefon", user.getId())
+              );
+              break;
+          }
+
+          if (slot != null)
+          {
+            LOGGER.debug("slot={}", slot);
+            slotClient.assignExtension(slot.getId(), phoneNumber);
+          }
+        }
+      }
+
+      user = userClient.getUser(user.getUsername());
+      LOGGER.debug("user = {}", user);
+    }
   }
 
   public void createUpdateUsers() throws Throwable

@@ -37,6 +37,8 @@ public class LdapConfig
 {
   private String baseDn;
 
+  int pagedResultSize;
+  
   private LdapHost ldapHost;
 
   private String filter;

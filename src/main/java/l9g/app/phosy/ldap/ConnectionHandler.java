@@ -46,7 +46,7 @@ public class ConnectionHandler
     LDAPConnection ldapConnection;
     LdapHost ldapHost = this.config.getLdapHost();
 
-    LDAPConnectionOptions options = new LDAPConnectionOptions();
+    LDAPConnectionOptions options = new LDAPConnectionOptions();    
     if (ldapHost.isSslEnabled())
     {
       ldapConnection = new LDAPConnection(createSSLSocketFactory(), options,

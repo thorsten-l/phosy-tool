@@ -16,11 +16,13 @@
 package l9g.app.phosy.ucware.user;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
+import com.unboundid.asn1.ASN1OctetString;
 import com.unboundid.ldap.sdk.Entry;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
 import com.unboundid.ldap.sdk.SearchScope;
+import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import l9g.app.phosy.App;
@@ -110,23 +112,44 @@ public class UserLdapHandler
         uidAttributeName);
     }
 
-    SearchResult sourceSearchResult = connection.search(searchRequest);
+    int totalSourceEntries = 0;
+    ASN1OctetString resumeCookie = null;
+    SimplePagedResultsControl responseControl = null;
 
-    int sourceEntries = sourceSearchResult.getEntryCount();
+    int pagedResultSize = ldapConfig.getPagedResultSize() > 0
+      ? ldapConfig.getPagedResultSize() : 1000;
 
-    if (sourceEntries > 0)
+    do
     {
-      LOGGER.info("build list from source DNs, {} entries", sourceEntries);
+      searchRequest.setControls(
+        new SimplePagedResultsControl(pagedResultSize, resumeCookie));
 
-      for (Entry entry : sourceSearchResult.getSearchEntries())
+      SearchResult sourceSearchResult = connection.search(searchRequest);
+
+      int sourceEntries = sourceSearchResult.getEntryCount();
+      totalSourceEntries += sourceEntries;
+
+      if (sourceEntries > 0)
       {
-        LdapUtil ldapUtil = new LdapUtil(userConfig, entry);
-        ldapEntryMap.put(
-          ldapUtil.value(UcwareAttributeType.LDAP_UID).trim().toLowerCase(), 
-          entry);
+        LOGGER.debug("build list from source DNs, {} entries", sourceEntries);
+
+        for (Entry entry : sourceSearchResult.getSearchEntries())
+        {
+          LdapUtil ldapUtil = new LdapUtil(userConfig, entry);
+          ldapEntryMap.put(
+            ldapUtil.value(UcwareAttributeType.LDAP_UID).trim().toLowerCase(),
+            entry);
+        }
+
+        responseControl = SimplePagedResultsControl.get(sourceSearchResult);
+        resumeCookie = responseControl.getCookie();
       }
     }
-    else
+    while (responseControl != null && responseControl.moreResultsToReturn());
+
+    LOGGER.info("build list from source DNs, {} entries", totalSourceEntries);
+
+    if (totalSourceEntries == 0)
     {
       LOGGER.info("No entries to synchronize found");
     }
