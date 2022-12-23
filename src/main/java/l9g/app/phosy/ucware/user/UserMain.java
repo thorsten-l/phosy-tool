@@ -57,10 +57,7 @@ public class UserMain
 ////////////
       
       userHandler.readAllUsers();
-      ldapHandler.readAllLdapEntryUIDs();
-      
-      System.exit(0);
-      
+      ldapHandler.readAllLdapEntryUIDs();            
       userHandler.removeUnknownUser();
 
       ldapHandler.readLdapEntries(timestampUtil.getLastSyncTimestamp(), true);

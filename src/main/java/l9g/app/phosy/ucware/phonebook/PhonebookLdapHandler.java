@@ -141,7 +141,10 @@ public class PhonebookLdapHandler
         }
 
         responseControl = SimplePagedResultsControl.get(sourceSearchResult);
-        resumeCookie = responseControl.getCookie();
+        if ( responseControl != null )
+        {
+          resumeCookie = responseControl.getCookie();
+        }
       }
     }
     while (responseControl != null && responseControl.moreResultsToReturn());

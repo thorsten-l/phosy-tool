@@ -146,14 +146,15 @@ public class UserHandler
     }
     else
     {
-      LOGGER.info("IGNORE: DELETE user {} has no external id", user.
+      LOGGER.debug("IGNORE: DELETE user {} has no external id", user.
         getUsername());
     }
     return result;
   }
 
   private boolean saveUpdateUser(
-    LdapUtil ldapUtil, Bindings bindings, UcwareUser user, Entry entry)
+    LdapUtil ldapUtil, Bindings bindings, UcwareUser user, Entry entry) throws
+    Throwable
   {
     boolean result = false;
     boolean ignore = false;
@@ -191,10 +192,58 @@ public class UserHandler
         {
           LOGGER.info("* save update user = {}", user.getUsername());
 
-          // TODO: user phonenumber != entry phonenumber
-          // delete 
-          // create
-          // else -> update user
+          if (user.getExtensions().length > 1)
+          {
+            LOGGER.warn("\n{}\n{} {}\n{}",
+              user.getUsername(),
+              user.getFirstname(), user.getLastname(),
+              user.getEmail());
+            LOGGER.warn(MARKER,
+              "IGNORE: UPDATE user {} has more than one phonenumber (extension).",
+              user.getUsername());
+          }
+          else
+          {
+            String ucwarePhonenumber
+              = (user.getExtensions() != null && user.getExtensions().length
+              == 1)
+                ? user.getExtensions()[0] : null;
+
+            String ldapPhonenumber = ldapUtil.value(LDAP_TELEPHONENUMBER);
+
+            if (ucwarePhonenumber != null && ldapPhonenumber != null
+              && ucwarePhonenumber.equals(ldapPhonenumber))
+            {
+              // update
+              LOGGER.info("  ** update user = {}", user.getUsername());
+              
+              //////////////////////////////////////////////////////////////////
+              // update user
+              //////////////////////////////////////////////////////////////////
+
+              UcwareParamUser paramUser = new UcwareParamUser(
+                bindings, config.getDefaultAuthBackend(),
+                config.getDefaultLanguage());
+
+              /*
+              LOGGER.info("ucwarePhonenumber={}", ucwarePhonenumber);
+              LOGGER.info("ldapPhonenumber={}", ldapPhonenumber);
+              LOGGER.info("user={}", user);
+              LOGGER.info("paramUser={}", paramUser);
+               */
+              
+              // UcwareUser updatedUser = 
+                userClient.updateUser(paramUser);
+              // LOGGER.info("updated user={}", updatedUser);
+            }
+            else
+            {
+              //
+              LOGGER.info("  ** recreate user = {}", user.getUsername());
+              saveDeleteUser(user);
+              createUsers(ldapUtil, bindings, entry);
+            }
+          }
         }
       }
     }
@@ -262,7 +311,6 @@ public class UserHandler
         ldapUtil.value(LDAP_TELEPHONENUMBER),
         bindings.get("locality"));
 
-      // TODO: create new user
       UcwareParamUser paramUser = new UcwareParamUser(
         bindings, config.getDefaultAuthBackend(),
         config.getDefaultLanguage());

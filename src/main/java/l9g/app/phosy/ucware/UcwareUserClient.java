@@ -95,6 +95,20 @@ public class UcwareUserClient extends UcwareClient
 
     return response.getUser();
   }
+  
+  public UcwareUser updateUser(UcwareParamUser paramUser)
+  {
+    LOGGER.debug("newUser({})", paramUser);
+
+    UcwareUserResponse response = postRequest("updateUser",
+      new Object[]
+      {
+        paramUser
+      },
+      UcwareUserResponse.class);
+
+    return response.getUser();
+  }
 
   public UcwareUser getUser(String username)
   {
