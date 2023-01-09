@@ -63,7 +63,6 @@ public class UserHandler
     userClient = UcwareClientFactory.getUserClient(ucwareConfig);
     groupClient = UcwareClientFactory.getGroupClient(ucwareConfig);
     slotClient = UcwareClientFactory.getSlotClient(ucwareConfig);
-    ignoreGroupsList = new ArrayList<>();
   }
 
   public static UserHandler getInstance()
@@ -216,11 +215,10 @@ public class UserHandler
             {
               // update
               LOGGER.info("  ** update user = {}", user.getUsername());
-              
+
               //////////////////////////////////////////////////////////////////
               // update user
               //////////////////////////////////////////////////////////////////
-
               UcwareParamUser paramUser = new UcwareParamUser(
                 bindings, config.getDefaultAuthBackend(),
                 config.getDefaultLanguage());
@@ -231,9 +229,8 @@ public class UserHandler
               LOGGER.info("user={}", user);
               LOGGER.info("paramUser={}", paramUser);
                */
-              
               // UcwareUser updatedUser = 
-                userClient.updateUser(paramUser);
+              userClient.updateUser(paramUser);
               // LOGGER.info("updated user={}", updatedUser);
             }
             else
@@ -414,58 +411,48 @@ public class UserHandler
       String uid = ldapUtil.value(LDAP_UID).trim().toLowerCase();
       Bindings bindings = UserScriptHandler.run(config, entry);
 
-      if (true)     // !matchIgnoreList(uid))
+      // if (true)     // !matchIgnoreList(uid))
+      // {
+      if (ucwareUserMap.containsKey(uid))
       {
-        if (ucwareUserMap.containsKey(uid))
+        if (bindings.get("doNotUpdate") != null
+          && ((Boolean) bindings.get("doNotUpdate")))
         {
-          if (bindings.get("doNotUpdate") != null
-            && ((Boolean) bindings.get("doNotUpdate")).booleanValue())
-          {
-            LOGGER.info("- not updating {} {} {} {}",
-              ldapUtil.value(LDAP_UID),
-              ldapUtil.value(LDAP_MAIL),
-              ldapUtil.value(LDAP_TELEPHONENUMBER),
-              bindings.get("locality"));
-          }
-          else
-          {
-            LOGGER.info("* updating {} {} {} {}",
-              ldapUtil.value(LDAP_UID),
-              ldapUtil.value(LDAP_MAIL),
-              ldapUtil.value(LDAP_TELEPHONENUMBER),
-              bindings.get("locality"));
-            UcwareUser user = ucwareUserMap.get(ldapUtil.value(LDAP_UID));
-            saveUpdateUser(ldapUtil, bindings, user, entry);
-          }
+          LOGGER.info("- not updating {} {} {} {}",
+            ldapUtil.value(LDAP_UID),
+            ldapUtil.value(LDAP_MAIL),
+            ldapUtil.value(LDAP_TELEPHONENUMBER),
+            bindings.get("locality"));
         }
         else
         {
-          if (bindings.get("doNotCreate") != null
-            && ((Boolean) bindings.get("doNotCreate")).booleanValue())
-          {
-            LOGGER.info("- not creating {} {} {} {}",
-              ldapUtil.value(LDAP_UID),
-              ldapUtil.value(LDAP_MAIL),
-              ldapUtil.value(LDAP_TELEPHONENUMBER),
-              bindings.get("locality"));
-          }
-          else
-          {
-            createUsers(ldapUtil, bindings, entry);
-          }
+          LOGGER.info("* updating {} {} {} {}",
+            ldapUtil.value(LDAP_UID),
+            ldapUtil.value(LDAP_MAIL),
+            ldapUtil.value(LDAP_TELEPHONENUMBER),
+            bindings.get("locality"));
+          UcwareUser user = ucwareUserMap.get(ldapUtil.value(LDAP_UID));
+          saveUpdateUser(ldapUtil, bindings, user, entry);
         }
       }
       else
       {
-        LOGGER.info("# ignoring {} {} {}",
-          ldapUtil.value(LDAP_UID),
-          ldapUtil.value(LDAP_MAIL),
-          ldapUtil.value(LDAP_TELEPHONENUMBER));
+        if (bindings.get("doNotCreate") != null 
+          && ((Boolean) bindings.get("doNotCreate")))
+        {
+          LOGGER.info("- not creating {} {} {} {}",
+            ldapUtil.value(LDAP_UID),
+            ldapUtil.value(LDAP_MAIL),
+            ldapUtil.value(LDAP_TELEPHONENUMBER),
+            bindings.get("locality"));
+        }
+        else
+        {
+          createUsers(ldapUtil, bindings, entry);
+        }
       }
     }
   }
-
-  private final ArrayList<Integer> ignoreGroupsList;
 
   private final HashMap<String, UcwareUser> ucwareUserMap = new HashMap<>();
 

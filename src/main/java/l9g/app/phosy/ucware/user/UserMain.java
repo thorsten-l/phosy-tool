@@ -49,6 +49,7 @@ public class UserMain
     {
       UserLdapHandler ldapHandler = UserLdapHandler.getInstance();
 
+      // 'admins' and 'syncignore' group
       userHandler.readIgnoreGroups();
       
 ////////////
