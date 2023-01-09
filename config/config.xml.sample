@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration version="2.0">
+
+  <timezone>Europe/Berlin</timezone>
+
+  <userConfig 
+    enabled="true" 
+    defaultAuthBackend="ucware" 
+    defaultLanguage="de">
+    
+    <updatesDisabled>true</updatesDisabled>
+    
+    <ldapConfig>
+      <baseDn>dc=example,dc=org</baseDn>
+
+      <pagedResultSize>1000</pagedResultSize>
+
+      <ldapHost>
+        <hostname>localhost</hostname>
+        <port>3389</port>
+        <sslEnabled>false</sslEnabled>
+      </ldapHost>
+
+      <filter>(&amp;(telephoneNumber=*)(modifyTimestamp>={0})(|(employeeType=m)(employeeType=az)(employeeType=p)))</filter>
+
+      <credentials>
+        <bindDN>your bind dn</bindDN>
+        <password>encrypted password</password>
+      </credentials>
+    </ldapConfig>
+
+    <ucwareConfig>
+      <ucwareHost>
+        <apiUrl>https://ucware/ucware/api</apiUrl>
+        <ignoreCertificate>true</ignoreCertificate>
+      </ucwareHost>
+      <credentials>
+        <uid>apiuser</uid>
+        <password>encrypted password</password>
+      </credentials>
+    </ucwareConfig>
+
+    <attributeTypeMapping>
+      <mapEntry type="LDAP_UID" name="uid" />
+      <mapEntry type="LDAP_GIVENNAME" name="givenName" />
+      <mapEntry type="LDAP_SN" name="sn" />
+      <mapEntry type="LDAP_MAIL" name="mail" />
+      <mapEntry type="LDAP_TELEPHONENUMBER" name="telephoneNumber" />
+      <mapEntry type="LDAP_LOCALITY" name="l" />
+    </attributeTypeMapping>
+  </userConfig>
+
+  <phonebookConfig enabled="true">
+    <phonebookName>LDAP-PN</phonebookName>
+    <phonebookUUID>00000000-1111-2222-3333-444444444444</phonebookUUID>
+
+    <ldapConfig>
+      <baseDn>dc=sonia,dc=de</baseDn>
+
+      <ldapHost>
+        <hostname>localhost</hostname>
+        <port>3389</port>
+        <sslEnabled>false</sslEnabled>
+      </ldapHost>
+
+      <filter>(&amp;(telephoneNumber=*)(modifyTimestamp>={0})(|(employeeType=m)(employeeType=az)(employeeType=p)))</filter>
+
+      <credentials>
+        <bindDN>bind dn</bindDN>
+        <password>encrypted password</password>
+      </credentials>
+    </ldapConfig>
+
+    <ucwareConfig>
+      <ucwareHost>
+        <apiUrl>https://ucware/ucware/api</apiUrl>
+        <ignoreCertificate>true</ignoreCertificate>
+      </ucwareHost>
+      <credentials>
+        <uid>apiuser</uid>
+        <password>encrypted password</password>
+      </credentials>
+    </ucwareConfig>
+
+    <attributeTypeMapping>
+      <mapEntry type="UCW_EMAIL" name="mail" />
+      <mapEntry type="UCW_PHONENUMBER_HIGH_PRIORITY" name="telephoneNumber" />
+      <mapEntry type="UCW_DEPARTMENT" name="ou" />
+      <mapEntry type="UCW_POSITION" name="title" />
+      <mapEntry type="LDAP_SN" name="sn" />
+      <mapEntry type="LDAP_GIVENNAME" name="givenName" />
+      <mapEntry type="LDAP_EMPLOYEETYPE" name="emplyeeType" />
+      <mapEntry type="LDAP_LOCALITY" name="l" />
+      <mapEntry type="LDAP_ACADEMIC_TITLE" name="soniaAcademicTitle" />
+      
+      <!--
+    <mapEntry ucwareType="UCW_GENERIC_TEXT" ldapName="description" />
+    <mapEntry ucwareType="UCW_PHONENUMBER" ldapName="telephoneNumber" />
+    <mapEntry ucwareType="UCW_FAXIMILENUMBER" ldapName="facsimileNumber" />
+    <mapEntry ucwareType="UCW_EMAIL" ldapName="mail" />
+    <mapEntry ucwareType="UCW_HYPERLINK" ldapName="hyperlink" />
+    <mapEntry ucwareType="UCW_PHONENUMBER_HIGH_PRIORITY" ldapName="telephoneNumber" />
+    <mapEntry ucwareType="UCW_COMPANY" ldapName="o" />
+    <mapEntry ucwareType="UCW_DEPARTMENT" ldapName="ou" />
+    <mapEntry ucwareType="UCW_POSITION" ldapName="title" />
+    <mapEntry ucwareType="LDAP_SN" ldapName="sn" />
+    <mapEntry ucwareType="LDAP_GIVENNAME" ldapName="givenName" />
+    <mapEntry ucwareType="LDAP_EMPLOYEETYPE" ldapName="emplyeeType" />
+    <mapEntry ucwareType="LDAP_LOCALITY" ldapName="l" />
+    <mapEntry ucwareType="LDAP_ACADEMIC_TITLE" ldapName="soniaAcademicTitle" />
+    <mapEntry ucwareType="LDAP_CN" ldapName="cn" />
+      -->
+      
+    </attributeTypeMapping>
+  
+  </phonebookConfig>
+  
+  
+  <mailConfig enabled="true">
+
+    <smtpHost>mail dns name</smtpHost>
+    <smtpPort>587</smtpPort>
+    <startTLS>true</startTLS>
+    
+    <subject>%date{yyyy-MM-dd HH:mm:ss} - %m</subject>
+    <from>PHOSY-Tool &lt;logger&gt;</from>
+    
+    <receipients>
+      <to>the receipients address</to>
+    </receipients>
+    
+    <credentials>
+      <uid>mail user</uid>
+      <password>encrypted password</password>
+    </credentials>
+  </mailConfig>
+  
+</configuration>
