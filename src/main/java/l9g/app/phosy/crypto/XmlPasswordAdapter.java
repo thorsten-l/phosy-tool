@@ -28,12 +28,14 @@ public class XmlPasswordAdapter extends XmlAdapter<String, String>
   @Override
   public String unmarshal(String encryptedText) throws Exception
   {
-    return CIPHER.decrypt(encryptedText);
+    return encryptedText != null && encryptedText.trim().length() > 0 
+      ? CIPHER.decrypt(encryptedText) : null;
   }
 
   @Override
   public String marshal(String plainText) throws Exception
   {
-    return CIPHER.encrypt(plainText);
+    return plainText != null && plainText.trim().length() > 0 
+      ? CIPHER.encrypt(plainText) : null;
   }
 }
