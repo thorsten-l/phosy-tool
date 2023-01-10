@@ -33,9 +33,10 @@ build task
 
 ## "Configure" your own attribute set
 
-1. edit `jsh/createAttributes.jsh`
+1. edit `jsh/createPhonebookAttributes.jsh`
+2. edit `jsh/createUserAttributes.jsh`
 
-`jsh/createAttributes.jsh` is Java (NOT JavaScript) code, executed by an embedded JShell for every single LDAP entry during the synchronization process.
+`jsh/*.jsh` is Java (NOT JavaScript) code, executed by an embedded JShell for every single LDAP entry during the synchronization process.
 
 You can build your own phonenumber normalizer or specify how prefix and suffix will be created. Use the delivered code as a sample.
 
@@ -48,6 +49,8 @@ Usage: phosy-tool [options]
                              false)
  --backup-phonebook (-b)   : Export Ucware phonebook <UUID> required (export
                              without UUIDs) (Vorgabe: false)
+ --debug                   : Enable DEBUG logging (Vorgabe: false)
+ --dry-run                 : Enable dry run for testing (Vorgabe: false)
  --encrypt (-e) WERT       : Encrypt given password
  --export-phonebook (-x)   : Export Ucware phonebook <UUID> required (Vorgabe:
                              false)
@@ -61,8 +64,10 @@ Usage: phosy-tool [options]
  --name WERT               : phonebook name
  --remove-phonebook (-r)   : Remove Ucware phonebook <UUID> required (Vorgabe:
                              false)
- --sync (-s)               : Sync Ucware phonebook with LDAP (Vorgabe: false)
+ --sync-phonebook          : Sync Ucware user phonebook with LDAP (Vorgabe:
+                             false)
+ --sync-users              : Sync Ucware users with LDAP (Vorgabe: false)
  --uuid WERT               : phonebook uuid
- --verbose (-v)            : Detailed phonebook info (Vorgabe: false)
+ --verbose (-v)            : Detailed info (Vorgabe: false)
  --version                 : Display programm version (Vorgabe: false)
 ```
