@@ -35,6 +35,7 @@ import l9g.app.phosy.ucware.slot.model.UcwareSlot;
 import l9g.app.phosy.ucware.slot.requestparam.UcwareParamSlot;
 import l9g.app.phosy.ucware.user.model.UcwareUser;
 import l9g.app.phosy.ucware.user.requestparam.UcwareParamUser;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -437,7 +438,7 @@ public class UserHandler
       }
       else
       {
-        if (bindings.get("doNotCreate") != null 
+        if (bindings.get("doNotCreate") != null
           && ((Boolean) bindings.get("doNotCreate")))
         {
           LOGGER.info("- not creating {} {} {} {}",
@@ -454,6 +455,19 @@ public class UserHandler
     }
   }
 
+  public void modifyExternalId(UcwareUser ucwareUser, String entryDn)
+  {
+    if (!entryDn.equals(ucwareUser.getExternalId()))
+    {
+      LOGGER.debug(
+        "modifyExternalId {} : {}", ucwareUser.getUsername(), entryDn);
+      UcwareParamUser paramUser = new UcwareParamUser(
+        ucwareUser, entryDn);
+      userClient.updateUser(paramUser);
+    }
+  }
+
+  @Getter
   private final HashMap<String, UcwareUser> ucwareUserMap = new HashMap<>();
 
   private final static UserConfig config = App.getConfig().getUserConfig();

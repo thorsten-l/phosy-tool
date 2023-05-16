@@ -17,21 +17,29 @@ package l9g.app.phosy.ucware.user;
 
 import com.unboundid.asn1.ASN1GeneralizedTime;
 import com.unboundid.asn1.ASN1OctetString;
+import com.unboundid.ldap.sdk.DN;
 import com.unboundid.ldap.sdk.Entry;
 import com.unboundid.ldap.sdk.LDAPConnection;
+import com.unboundid.ldap.sdk.Modification;
+import com.unboundid.ldap.sdk.ModificationType;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
+import com.unboundid.ldap.sdk.SearchResultEntry;
 import com.unboundid.ldap.sdk.SearchScope;
 import com.unboundid.ldap.sdk.controls.SimplePagedResultsControl;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import l9g.app.phosy.App;
+import l9g.app.phosy.Options;
 import l9g.app.phosy.ldap.ConnectionHandler;
 import l9g.app.phosy.config.LdapConfig;
 import l9g.app.phosy.config.LdapUcwareType;
 import l9g.app.phosy.config.UserConfig;
 import l9g.app.phosy.ldap.LdapUtil;
 import l9g.app.phosy.ucware.UcwareAttributeType;
+import l9g.app.phosy.ucware.user.model.UcwareUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Getter;
@@ -153,13 +161,79 @@ public class UserLdapHandler
     }
     else
     {
-      LOGGER.info("build list from source DNs, {} entries", totalSourceEntries);    
+      LOGGER.info("build list from source DNs, {} entries", totalSourceEntries);
     }
   }
 
   public void readAllLdapEntryUIDs() throws Throwable
   {
     readLdapEntries(new ASN1GeneralizedTime(0), false);
+  }
+
+  public String addRoles(Options options, UserHandler userHandler)
+    throws Throwable
+  {
+    LDAPConnection connection = new ConnectionHandler(ldapConfig).
+      getConnection();
+    String baseDn = ldapConfig.getBaseDn();
+
+    String ucwareRole = DN.normalize(options.getLdapRole());
+
+    for (UcwareUser ucwareUser : userHandler.getUcwareUserMap().values())
+    {
+      if (options.getAuthBackendName().equals(ucwareUser.getAuthBackend()))
+      {
+        SearchRequest searchRequest = new SearchRequest(baseDn, SearchScope.SUB,
+          "(uid=" + ucwareUser.getUsername() + ")", "nsRoleDn");
+
+        SearchResult sourceSearchResult = connection.search(searchRequest);
+
+        int sourceEntries = sourceSearchResult.getEntryCount();
+
+        if (sourceEntries == 1)
+        {
+          SearchResultEntry entry
+            = sourceSearchResult.getSearchEntries().get(0);
+          String entryDn = DN.normalize(entry.getDN());
+          String[] entryRoles = entry.getAttributeValues("nsRoleDN");
+
+          LOGGER.debug("{} {} : {} : {} : {}", ucwareUser.getFirstname(), 
+            ucwareUser.getLastname(), ucwareUser.getUsername(), 
+            ucwareUser.getAuthBackend(), entryDn);
+
+          LOGGER.debug("  * {}", ucwareUser.getExternalId());
+
+          boolean userHasNotUcwareRole = true;
+
+          for (String role : entryRoles)
+          {
+            String nsRoleDN = DN.normalize(role);
+            LOGGER.debug("  - {}", nsRoleDN);
+            if (ucwareRole.equals(nsRoleDN))
+            {
+              userHasNotUcwareRole = false;
+              break;
+            }
+          }
+
+          if (userHasNotUcwareRole)
+          {
+            LOGGER.debug("  + ADDING role {}", ucwareRole);
+
+            List<Modification> modifications = new ArrayList<>();
+
+            modifications.add(new Modification(
+              ModificationType.ADD, "nsRoleDn", ucwareRole));
+
+           // System.exit(0);
+           connection.modify(entryDn, modifications);
+          }
+
+          userHandler.modifyExternalId(ucwareUser, entryDn);
+        }
+      }
+    }
+    return null;
   }
 
   @Getter

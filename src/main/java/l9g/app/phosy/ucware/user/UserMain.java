@@ -17,6 +17,7 @@ package l9g.app.phosy.ucware.user;
 
 import l9g.app.phosy.Options;
 import l9g.app.phosy.TimestampUtil;
+import l9g.app.phosy.ucware.user.model.UcwareUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,25 +41,35 @@ public class UserMain
     return SINGLETON;
   }
 
-  public void run(Options OPTIONS) throws Throwable
+  public void run(Options options) throws Throwable
   {
     TimestampUtil timestampUtil = new TimestampUtil("users");
     UserHandler userHandler = UserHandler.getInstance();
 
-    if (OPTIONS.isSyncUsers())
+    if (options.getLdapRole() != null
+      && options.getLdapRole().trim().length() > 0
+      && options.getAuthBackendName() != null
+      && options.getAuthBackendName().trim().length() > 0)
+    {
+      UserLdapHandler ldapHandler = UserLdapHandler.getInstance();
+      userHandler.readAllUsers();
+      
+      ldapHandler.addRoles(options, userHandler);
+    }
+
+    if (options.isSyncUsers())
     {
       UserLdapHandler ldapHandler = UserLdapHandler.getInstance();
 
       // 'admins' and 'syncignore' group
       userHandler.readIgnoreGroups();
-      
+
 ////////////
 //      userHandler.readAllUsers();
 //      userHandler.removeAllSyncedUsers();
 ////////////
-      
       userHandler.readAllUsers();
-      ldapHandler.readAllLdapEntryUIDs();            
+      ldapHandler.readAllLdapEntryUIDs();
       userHandler.removeUnknownUser();
 
       ldapHandler.readLdapEntries(timestampUtil.getLastSyncTimestamp(), true);

@@ -242,4 +242,21 @@ public class Options
   @Setter
   private boolean importPhonebook = false;
 
+  
+  @Option(
+    name = "--add-ldap-role-from-auth-backend",
+    usage = "add ldap role from phone system auth backend (needs --auth-backend-name)"
+  )
+  @Getter
+  @Setter
+  private String ldapRole = null;
+
+  @Option(
+    name = "--auth-backend-name",
+    usage = "needed by --add-ldap-role-from-auth-backend"
+  )
+  @Getter
+  @Setter
+  private String authBackendName = null;
+
 }

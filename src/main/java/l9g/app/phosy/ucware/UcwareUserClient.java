@@ -98,7 +98,7 @@ public class UcwareUserClient extends UcwareClient
   
   public UcwareUser updateUser(UcwareParamUser paramUser)
   {
-    LOGGER.debug("newUser({})", paramUser);
+    LOGGER.debug("updateUser({})", paramUser);
 
     UcwareUserResponse response = postRequest("updateUser",
       new Object[]
