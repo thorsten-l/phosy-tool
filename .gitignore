@@ -10,7 +10,7 @@ private/
 /jsh/
 phosy-tool/
 production
-secret.bin
+secret.*
 var/
 lastsync.timestamp
 lastsync.timestamp*
