@@ -45,29 +45,38 @@ You can build your own phonenumber normalizer or specify how prefix and suffix w
 ```text
 Usage: phosy-tool [options]
 
- --add-phonebook (-a)      : Add Ucware phonebook <NAME> required (Vorgabe:
-                             false)
- --backup-phonebook (-b)   : Export Ucware phonebook <UUID> required (export
-                             without UUIDs) (Vorgabe: false)
- --debug                   : Enable DEBUG logging (Vorgabe: false)
- --dry-run                 : Enable dry run for testing (Vorgabe: false)
- --encrypt (-e) WERT       : Encrypt given password
- --export-phonebook (-x)   : Export Ucware phonebook <UUID> required (Vorgabe:
-                             false)
- --file (-f) WERT          : filename
- --generate (-g) N         : Generate random password (Vorgabe: 0)
- --help (-h)               : Displays this help (Vorgabe: true)
- --import-phonebook (-imp) : Import --file <CSV or JSON> file into --name
-                             <phonebook name> (Vorgabe: false)
- --info-phonebook (-i)     : Info about Ucware phonebook <NAME> or <UUID>
-                             required (Vorgabe: false)
- --name WERT               : phonebook name
- --remove-phonebook (-r)   : Remove Ucware phonebook <UUID> required (Vorgabe:
-                             false)
- --sync-phonebook          : Sync Ucware user phonebook with LDAP (Vorgabe:
-                             false)
- --sync-users              : Sync Ucware users with LDAP (Vorgabe: false)
- --uuid WERT               : phonebook uuid
- --verbose (-v)            : Detailed info (Vorgabe: false)
- --version                 : Display programm version (Vorgabe: false)
+ --add-ldap-role-from-auth-backend WERT : add ldap role from phone system auth
+                                          backend (needs --auth-backend-name)
+ --add-phonebook (-a)                   : Add Ucware phonebook <NAME> required
+                                          (Vorgabe: false)
+ --auth-backend-name WERT               : needed by --add-ldap-role-from-auth-ba
+                                          ckend
+ --backup-phonebook (-b)                : Export Ucware phonebook <UUID>
+                                          required (export without UUIDs)
+                                          (Vorgabe: false)
+ --debug                                : Enable DEBUG logging (Vorgabe: false)
+ --dry-run                              : Enable dry run for testing (Vorgabe:
+                                          false)
+ --encrypt (-e) WERT                    : Encrypt given password
+ --export-phonebook (-x)                : Export Ucware phonebook <UUID>
+                                          required (Vorgabe: false)
+ --file (-f) WERT                       : filename
+ --generate (-g) N                      : Generate random password (Vorgabe: 0)
+ --help (-h)                            : Displays this help (Vorgabe: true)
+ --import-phonebook (-imp)              : Import --file <CSV or JSON> file into
+                                          --name <phonebook name> (Vorgabe:
+                                          false)
+ --info-phonebook (-i)                  : Info about Ucware phonebook <NAME> or
+                                          <UUID> required (Vorgabe: false)
+ --name WERT                            : phonebook name
+ --remove-phonebook (-r)                : Remove Ucware phonebook <UUID>
+                                          required (Vorgabe: false)
+ --sync-phonebook                       : Sync Ucware user phonebook with LDAP
+                                          (Vorgabe: false)
+ --sync-users                           : Sync Ucware users with LDAP (Vorgabe:
+                                          false)
+ --uuid WERT                            : phonebook uuid
+ --verbose (-v)                         : Detailed info (Vorgabe: false)
+ --version                              : Display programm version (Vorgabe:
+                                          false)
 ```
