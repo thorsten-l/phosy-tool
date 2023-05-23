@@ -150,7 +150,11 @@ public class UserLdapHandler
         }
 
         responseControl = SimplePagedResultsControl.get(sourceSearchResult);
-        resumeCookie = responseControl.getCookie();
+        
+        if (responseControl != null)
+        {
+          resumeCookie = responseControl.getCookie();
+        }
       }
     }
     while (responseControl != null && responseControl.moreResultsToReturn());
@@ -197,8 +201,8 @@ public class UserLdapHandler
           String entryDn = DN.normalize(entry.getDN());
           String[] entryRoles = entry.getAttributeValues("nsRoleDN");
 
-          LOGGER.debug("{} {} : {} : {} : {}", ucwareUser.getFirstname(), 
-            ucwareUser.getLastname(), ucwareUser.getUsername(), 
+          LOGGER.debug("{} {} : {} : {} : {}", ucwareUser.getFirstname(),
+            ucwareUser.getLastname(), ucwareUser.getUsername(),
             ucwareUser.getAuthBackend(), entryDn);
 
           LOGGER.debug("  * {}", ucwareUser.getExternalId());
@@ -225,8 +229,8 @@ public class UserLdapHandler
             modifications.add(new Modification(
               ModificationType.ADD, "nsRoleDn", ucwareRole));
 
-           // System.exit(0);
-           connection.modify(entryDn, modifications);
+            // System.exit(0);
+            connection.modify(entryDn, modifications);
           }
 
           userHandler.modifyExternalId(ucwareUser, entryDn);
