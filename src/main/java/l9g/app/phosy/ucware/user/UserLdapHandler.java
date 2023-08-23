@@ -150,7 +150,7 @@ public class UserLdapHandler
         }
 
         responseControl = SimplePagedResultsControl.get(sourceSearchResult);
-        
+
         if (responseControl != null)
         {
           resumeCookie = responseControl.getCookie();
@@ -183,6 +183,9 @@ public class UserLdapHandler
 
     String ucwareRole = DN.normalize(options.getLdapRole());
 
+    LOGGER.info( "Searching for UCware auth backend : {}", options.getAuthBackendName());
+    LOGGER.info( "Setting LDAP role: {}", ucwareRole );
+    
     for (UcwareUser ucwareUser : userHandler.getUcwareUserMap().values())
     {
       if (options.getAuthBackendName().equals(ucwareUser.getAuthBackend()))
@@ -230,10 +233,16 @@ public class UserLdapHandler
               ModificationType.ADD, "nsRoleDn", ucwareRole));
 
             // System.exit(0);
-            connection.modify(entryDn, modifications);
+            if (options.isDryRun() == false)
+            {
+              connection.modify(entryDn, modifications);
+            }
           }
 
-          userHandler.modifyExternalId(ucwareUser, entryDn);
+          if (options.isDryRun() == false)
+          {
+            userHandler.modifyExternalId(ucwareUser, entryDn);
+          }
         }
       }
     }

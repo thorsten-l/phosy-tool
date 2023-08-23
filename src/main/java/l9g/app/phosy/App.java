@@ -178,6 +178,11 @@ public class App
       System.exit(0);
     }
 
+    if (OPTIONS.isDryRun())
+    {
+      LOGGER.info("*** DRY RUN ***");
+    }
+    
     if (config.getUserConfig().isEnabled())
     {
       LOGGER.debug("User main enabled");
