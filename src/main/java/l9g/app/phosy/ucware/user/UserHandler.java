@@ -174,13 +174,10 @@ public class UserHandler
 
       if (ignore)
       {
-        LOGGER.warn("\n{}\n{} {}\n{}",
+        LOGGER.warn("IGNORE: UPDATE user {} is in admins or syncIgnore group. {} {} ({})",
           user.getUsername(),
           user.getFirstname(), user.getLastname(),
           user.getEmail());
-        LOGGER.warn(MARKER,
-          "IGNORE: UPDATE user {} is in admins or syncIgnore group.",
-          user.getUsername());
       }
       else
       {
