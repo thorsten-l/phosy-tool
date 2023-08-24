@@ -19,6 +19,8 @@ import l9g.app.phosy.ucware.common.request.UcwareRequest;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import l9g.app.phosy.App;
+import l9g.app.phosy.Options;
 import l9g.app.phosy.ucware.common.response.UcwareResponse;
 
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ public class UcwareClient
     = LoggerFactory.getLogger(UcwareClient.class.getName());
 
   private final WebTarget target;
+  private final Options options = App.getOPTIONS();
 
   public UcwareClient(WebTarget target)
   {
@@ -43,32 +46,35 @@ public class UcwareClient
   public <T> T postRequest(String method, Object[] param, Class<T> type,
     boolean ignoreErrors)
   {
+    T response = null;
     LOGGER.debug("postRequest({}, {}, {})", method, param, type.getSimpleName());
 
-    T response = target.request(MediaType.APPLICATION_JSON).
-      post(Entity.entity(new UcwareRequest(method, param),
-        MediaType.APPLICATION_JSON), type);
-
-    if (response instanceof UcwareResponse)
+    if (options.isDryRun() == false || method.startsWith("get"))
     {
-      UcwareResponse ucwareResponse = (UcwareResponse) response;
-      if (ucwareResponse != null && ucwareResponse.getError() != null)
+      response = target.request(MediaType.APPLICATION_JSON).
+        post(Entity.entity(new UcwareRequest(method, param),
+          MediaType.APPLICATION_JSON), type);
+
+      if (response instanceof UcwareResponse)
       {
-        LOGGER.error("ERROR: method={} param={} error={}", 
-          method, param, ucwareResponse.getError());
-        if (!ignoreErrors)
+        UcwareResponse ucwareResponse = (UcwareResponse) response;
+        if (ucwareResponse != null && ucwareResponse.getError() != null)
         {
-          System.exit(-1);
+          LOGGER.error("ERROR: method={} param={} error={}",
+            method, param, ucwareResponse.getError());
+          if (!ignoreErrors)
+          {
+            System.exit(-1);
+          }
         }
       }
-    }
 
-    if (response == null)
-    {
-      LOGGER.error("ERROR: response == null");
-      System.exit(-99);
+      if (response == null)
+      {
+        LOGGER.error("ERROR: response == null");
+        System.exit(-99);
+      }
     }
-
     return response;
   }
 
