@@ -61,6 +61,7 @@ public class UcwareGroupClient extends UcwareClient
       },
       UcwareGroupResponse.class);
 
+    LOGGER.debug("ucware group = {}", response.getGroup());
     return response.getGroup();
   }
 
@@ -74,6 +75,7 @@ public class UcwareGroupClient extends UcwareClient
       },
       UcwareGroupResponse.class, ignoreErrors);
 
+    LOGGER.debug("ucware group = {}", response.getGroup());
     return response.getGroup();
   }
 
