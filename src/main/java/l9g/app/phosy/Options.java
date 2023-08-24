@@ -242,6 +242,13 @@ public class Options
   @Setter
   private boolean importPhonebook = false;
 
+   @Option(
+    name = "--update-recreate",
+    usage = "Delete and recreate users during update process"
+  )
+  @Getter
+  @Setter
+  private boolean updateRecreate = false;
   
   @Option(
     name = "--add-ldap-role-from-auth-backend",

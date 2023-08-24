@@ -438,7 +438,18 @@ public class UserHandler
             ldapUtil.value(LDAP_TELEPHONENUMBER),
             bindings.get("locality"));
           UcwareUser user = ucwareUserMap.get(ldapUtil.value(LDAP_UID));
-          saveUpdateUser(ldapUtil, bindings, user, entry);
+
+          if (App.getOPTIONS().isUpdateRecreate())
+          {
+            if ( saveDeleteUser(user))
+            {
+              createUsers(ldapUtil, bindings, entry);
+            }
+          }
+          else
+          {
+            saveUpdateUser(ldapUtil, bindings, user, entry);
+          }
         }
       }
       else
