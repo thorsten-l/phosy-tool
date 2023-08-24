@@ -387,6 +387,11 @@ public class UserHandler
                 new UcwareParamSlot(slotType, "DECT-Telefon", user.getId())
               );
               break;
+            case "app":
+              slot = slotClient.newSlot(
+                new UcwareParamSlot(slotType, "Mobile-App", user.getId())
+              );
+              break;
           }
 
           if (slot != null)
