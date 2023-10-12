@@ -37,6 +37,7 @@ public class UcwareParamSlot
     this.clipInternal = "";
     this.clirExternal = false;
     this.clirInternal = false;
+    this.clirLocked = true;
 
     this.callVolume = 8;
     this.ringerVolume = 8;
@@ -49,6 +50,8 @@ public class UcwareParamSlot
   private final boolean clirInternal;
 
   private final boolean clirExternal;
+  
+  private final boolean clirLocked;
 
   private final String deviceType;
 

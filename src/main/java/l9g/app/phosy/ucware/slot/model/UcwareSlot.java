@@ -53,4 +53,6 @@ public class UcwareSlot
   private boolean clirInternal;
 
   private boolean clirExternal;
+  
+  private boolean clirLocked;
 }
