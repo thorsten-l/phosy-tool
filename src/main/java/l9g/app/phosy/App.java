@@ -80,20 +80,28 @@ public class App
           LOGGER.debug("setting config");
           config = c;
 
-          config.getUserConfig().setLdapMap(new HashMap<>());
-          for (LdapUcwareType type : config.getUserConfig().getMapEntry())
+          if (config.getUserConfig() != null)
           {
-            config.getUserConfig().getLdapMap().put(
-              type.getType(), type.getName());
+            config.getUserConfig().setLdapMap(new HashMap<>());
+            if (config.getUserConfig().getMapEntry() != null)
+            {
+              for (LdapUcwareType type : config.getUserConfig().getMapEntry())
+              {
+                config.getUserConfig().getLdapMap().put(
+                  type.getType(), type.getName());
+              }
+            }
           }
 
-          config.getPhonebookConfig().setLdapMap(new HashMap<>());
-          for (LdapUcwareType type : config.getPhonebookConfig().getMapEntry())
+          if (config.getPhonebookConfig() != null)
           {
-            config.getPhonebookConfig().getLdapMap().put(
-              type.getType(), type.getName());
+            config.getPhonebookConfig().setLdapMap(new HashMap<>());
+            for (LdapUcwareType type : config.getPhonebookConfig().getMapEntry())
+            {
+              config.getPhonebookConfig().getLdapMap().put(
+                type.getType(), type.getName());
+            }
           }
-
         }
       }
       else
@@ -145,7 +153,6 @@ public class App
     LOGGER.debug("logger context = {}", loggerContext.getName());
 
     // LOGGER.info( LogbackConfig.getInstance().getNotificationMarker(), "Test message" );
-    
     if (OPTIONS.getGeneratePasswordLength() > 0)
     {
       AES256 cipher = new AES256(AppSecretKey.getSecret());
@@ -182,14 +189,15 @@ public class App
     {
       LOGGER.info("*** DRY RUN ***");
     }
-    
-    if (config.getUserConfig().isEnabled())
+
+    if (config.getUserConfig() != null && config.getUserConfig().isEnabled())
     {
       LOGGER.debug("User main enabled");
       UserMain.getInstance().run(OPTIONS);
     }
 
-    if (config.getPhonebookConfig().isEnabled())
+    if (config.getPhonebookConfig() != null && 
+      config.getPhonebookConfig().isEnabled())
     {
       LOGGER.debug("Phonebook main enabled");
       PhonebookMain.getInstance().run(OPTIONS);
