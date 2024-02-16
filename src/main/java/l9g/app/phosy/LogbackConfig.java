@@ -57,7 +57,7 @@ public class LogbackConfig
 
     if (!initialized)
     {
-      LOGGER.info("Initializizng LogbackConfig() debugLogging={}", options.
+      LOGGER.info("Initializing LogbackConfig() debugLogging={}", options.
         isDebugLogging());
 
       loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
