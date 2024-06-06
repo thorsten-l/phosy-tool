@@ -17,6 +17,7 @@ package l9g.app.phosy.ucware.user;
 
 import com.unboundid.ldap.sdk.Entry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import javax.script.Bindings;
@@ -191,13 +192,16 @@ public class UserHandler
 
           if (user.getExtensions().length > 1)
           {
-            LOGGER.warn("\n{}\n{} {}\n{}",
-              user.getUsername(),
-              user.getFirstname(), user.getLastname(),
-              user.getEmail());
             LOGGER.warn(MARKER,
-              "IGNORE: UPDATE user {} has more than one phonenumber (extension).",
-              user.getUsername());
+              "IGNORE: UPDATE user {} has more than one phonenumber (extension).\n\n"
+              + "If necessary, when something concerning UCware has changed, an administrator must update the entry in UCware manually:\n"
+              + "- LDAP entry:   {}, {} | {} | {}\n"
+              + "- UCware entry: {}, {} | {} | {}",
+              user.getUsername(),
+              ldapUtil.value(LDAP_SN), ldapUtil.value(LDAP_GIVENNAME),
+              ldapUtil.value(LDAP_MAIL), ldapUtil.value(LDAP_TELEPHONENUMBER),
+              user.getLastname(), user.getFirstname(),
+              user.getEmail(), Arrays.toString(user.getExtensions()) );
           }
           else
           {
