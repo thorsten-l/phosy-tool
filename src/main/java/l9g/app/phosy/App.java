@@ -151,59 +151,67 @@ public class App
         OPTIONS, getConfig()).getLoggerContext();
 
     LOGGER.debug("logger context = {}", loggerContext.getName());
-
-    // LOGGER.info( LogbackConfig.getInstance().getNotificationMarker(), "Test message" );
-    if (OPTIONS.getGeneratePasswordLength() > 0)
+    
+    try
     {
-      AES256 cipher = new AES256(AppSecretKey.getSecret());
-      String password = PasswordGenerator.generate(OPTIONS.
-        getGeneratePasswordLength());
-      System.out.println("\npassword:  '" + password + "'");
-      System.out.println("encrypted: '" + cipher.encrypt(password) + "'\n");
+      // LOGGER.info( LogbackConfig.getInstance().getNotificationMarker(), "Test message" );
+      if (OPTIONS.getGeneratePasswordLength() > 0)
+      {
+        AES256 cipher = new AES256(AppSecretKey.getSecret());
+        String password = PasswordGenerator.generate(OPTIONS.
+          getGeneratePasswordLength());
+        System.out.println("\npassword:  '" + password + "'");
+        System.out.println("encrypted: '" + cipher.encrypt(password) + "'\n");
+        System.exit(0);
+      }
+
+      if (OPTIONS.getPassword() != null)
+      {
+        AES256 cipher = new AES256(AppSecretKey.getSecret());
+        System.out.println("\npassword:  '" + OPTIONS.getPassword() + "'");
+        System.out.println("encrypted: '" + cipher.encrypt(OPTIONS.getPassword())
+          + "'\n");
+        System.exit(0);
+      }
+
+      if (OPTIONS.isDisplayVersion())
+      {
+        buildInfo(System.out);
+        System.exit(0);
+      }
+
+      if (OPTIONS.isDisplayHelp())
+      {
+        System.out.println("\nUsage: phosy-tool [options]\n");
+        parser.printUsage(System.out);
+        System.exit(0);
+      }
+
+      if (OPTIONS.isDryRun())
+      {
+        LOGGER.info("*** DRY RUN ***");
+      }
+
+      if (config.getUserConfig() != null && config.getUserConfig().isEnabled())
+      {
+        LOGGER.debug("User main enabled");
+        UserMain.getInstance().run(OPTIONS);
+      }
+
+      if (config.getPhonebookConfig() != null && 
+        config.getPhonebookConfig().isEnabled())
+      {
+        LOGGER.debug("Phonebook main enabled");
+        PhonebookMain.getInstance().run(OPTIONS);
+      }
+
       System.exit(0);
     }
-
-    if (OPTIONS.getPassword() != null)
+    catch (Exception ex)
     {
-      AES256 cipher = new AES256(AppSecretKey.getSecret());
-      System.out.println("\npassword:  '" + OPTIONS.getPassword() + "'");
-      System.out.println("encrypted: '" + cipher.encrypt(OPTIONS.getPassword())
-        + "'\n");
-      System.exit(0);
+      LOGGER.error( "error occured", ex );
+      System.exit(-1);
     }
-
-    if (OPTIONS.isDisplayVersion())
-    {
-      buildInfo(System.out);
-      System.exit(0);
-    }
-
-    if (OPTIONS.isDisplayHelp())
-    {
-      System.out.println("\nUsage: phosy-tool [options]\n");
-      parser.printUsage(System.out);
-      System.exit(0);
-    }
-
-    if (OPTIONS.isDryRun())
-    {
-      LOGGER.info("*** DRY RUN ***");
-    }
-
-    if (config.getUserConfig() != null && config.getUserConfig().isEnabled())
-    {
-      LOGGER.debug("User main enabled");
-      UserMain.getInstance().run(OPTIONS);
-    }
-
-    if (config.getPhonebookConfig() != null && 
-      config.getPhonebookConfig().isEnabled())
-    {
-      LOGGER.debug("Phonebook main enabled");
-      PhonebookMain.getInstance().run(OPTIONS);
-    }
-
-    System.exit(0);
   }
 
   private static Configuration config;
