@@ -54,28 +54,28 @@ public class UcwareUserClient extends UcwareClient
     return response.getUserList();
   }
 
-  public int[] assignLicense(String username, int license)
+  public int[] assignLicense(int userId, int license)
   {
-    LOGGER.debug("assignLicense({},{})", username, license);
+    LOGGER.debug("assignLicense({},{})", userId, license);
 
     UcwareArrayOfIntResponse response = postRequest("assignLicense",
       new Object[]
       {
-        username, license
+        userId, license
       },
       UcwareArrayOfIntResponse.class);
 
     return response.getResult();
   }
 
-  public String[] assignExtension(String username, String extension)
+  public String[] assignExtension(int userId, String extension)
   {
-    LOGGER.debug("assignExtension({},{})", username, extension);
+    LOGGER.debug("assignExtension({},{})", userId, extension);
 
     UcwareArrayOfStringsResponse response = postRequest("assignExtension",
       new Object[]
       {
-        username, extension, true
+        userId, extension, true
       },
       UcwareArrayOfStringsResponse.class);
 
@@ -124,42 +124,42 @@ public class UcwareUserClient extends UcwareClient
     return response.getUser();
   }
 
-  public boolean deleteUser(String username)
+  public boolean deleteUser(int userId)
   {
-    LOGGER.debug("deleteUser({})", username);
+    LOGGER.debug("deleteUser({})", userId);
 
     UcwareBooleanResponse response = postRequest("deleteUser",
-      new String[]
+      new Object[]
       {
-        username
+        userId
       },
       UcwareBooleanResponse.class);
 
     return response.isResult();
   }
 
-  public boolean setPassword(String username, String password)
+  public boolean setPassword(int userId, String password)
   {
     LOGGER.debug("setPassword()");
 
     UcwareBooleanResponse response = postRequest("setPassword",
-      new String[]
+      new Object[]
       {
-        username, password
+        userId, password
       },
       UcwareBooleanResponse.class);
 
     return response.isResult();
   }
 
-  public boolean setPin(String username, String pin)
+  public boolean setPin(int userId, String pin)
   {
     LOGGER.debug("setPin()");
 
     UcwareBooleanResponse response = postRequest("setPin",
-      new String[]
+      new Object[]
       {
-        username, pin
+        userId, pin
       },
       UcwareBooleanResponse.class);
 

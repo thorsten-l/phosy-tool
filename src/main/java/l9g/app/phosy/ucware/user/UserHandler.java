@@ -140,7 +140,7 @@ public class UserHandler
           else
           {
             LOGGER.info("- save delete user = {}", user.getUsername());
-            result = userClient.deleteUser(user.getUsername());
+            result = userClient.deleteUser(user.getId());
           }
         }
       }
@@ -326,7 +326,7 @@ public class UserHandler
       {
         for (int license : licenses)
         {
-          userClient.assignLicense(user.getUsername(), license);
+          userClient.assignLicense(user.getId(), license);
         }
       }
 
@@ -348,7 +348,7 @@ public class UserHandler
 
       if (phoneNumber != null && phoneNumber.trim().length() > 0)
       {
-        userClient.assignExtension(user.getUsername(), phoneNumber);
+        userClient.assignExtension(user.getId(), phoneNumber);
 
         // mac Slot
         ArrayList<String> slotTypes = (ArrayList) bindings.
