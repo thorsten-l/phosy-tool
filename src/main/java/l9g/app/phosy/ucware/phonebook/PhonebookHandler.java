@@ -257,8 +257,8 @@ public class PhonebookHandler
       ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
       counter++;
-      System.out.println("*** counter = " + counter + ", " + contact.
-        getLastname() + ", " + contact.getFirstname());
+      LOGGER.debug("*** counter = {}, {}, {}", counter,
+        contact.getLastname(), contact.getFirstname());
     }
   }
 
@@ -339,27 +339,27 @@ public class PhonebookHandler
 
     if (infoPhonebook != null)
     {
-      System.out.println("phonebook name = " + infoPhonebook.getName());
-      System.out.println("phonebook uuid = " + infoPhonebook.getUuid());
+      LOGGER.info("phonebook name = {}", infoPhonebook.getName());
+      LOGGER.info("phonebook uuid = {}", infoPhonebook.getUuid());
 
       if (verbose)
       {
-        System.out.println("phonebook # groups = " + infoPhonebook.getGroups().
+        LOGGER.info("phonebook # groups = {}", infoPhonebook.getGroups().
           size());
         int numberOfContacts = 0;
         for (UcwareContactGroup group : infoPhonebook.getGroups())
         {
-          System.out.println("  - phonebook groups name = " + group.getName());
-          System.out.println("  - phonebook groups # contacts = "
-            + group.getContacts().size());
+          LOGGER.info("  - phonebook groups name = {}", group.getName());
+          LOGGER.info("  - phonebook groups # contacts = {}",
+            group.getContacts().size());
           numberOfContacts += group.getContacts().size();
         }
-        System.out.println("phonebook # contacts = " + numberOfContacts);
+        LOGGER.info("phonebook # contacts = {}", numberOfContacts);
       }
     }
     else
     {
-      System.out.println("Phonebook '" + phonebookName + "' not found.");
+      LOGGER.error("Phonebook '{}' not found", phonebookName);
     }
   }
 
@@ -368,8 +368,8 @@ public class PhonebookHandler
     Options.checkNameRequired();
     String phonebookName = App.getOPTIONS().getName();
     phonebook = ucwareClient.newUserPhonebook(phonebookName, true);
-    System.out.println("phonebook name = " + phonebook.getName());
-    System.out.println("phonebook uuid = " + phonebook.getUuid());
+    LOGGER.info("phonebook name = {}", phonebook.getName());
+    LOGGER.info("phonebook uuid = {}", phonebook.getUuid());
   }
 
   public void deletePhonebook()
@@ -404,7 +404,7 @@ public class PhonebookHandler
       String[] line;
       while ((line = csvReader.readNext()) != null)
       {
-        System.out.println(line[2]);
+        LOGGER.debug(line[2]);
 
         LOGGER.debug("contactGroup={}", contactGroup);
 

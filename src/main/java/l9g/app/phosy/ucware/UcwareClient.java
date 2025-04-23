@@ -47,8 +47,8 @@ public class UcwareClient
     boolean ignoreErrors)
   {
     T response = null;
-    LOGGER.debug("postRequest({}, {}, {})", method, param, type.getSimpleName());
-
+    LOGGER.debug("postRequest(uri={}, method={}, params={}, type={})", target.getUri(), method, param, type.getSimpleName());
+    
     if (options.isDryRun() == false || method.startsWith("get"))
     {
       response = target.request(MediaType.APPLICATION_JSON).
