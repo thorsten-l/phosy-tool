@@ -17,7 +17,7 @@ package l9g.app.phosy.ucware;
 
 import l9g.app.phosy.ucware.device.model.UcwareDevice;
 import l9g.app.phosy.ucware.device.response.UcwareDeviceResponse;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.WebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

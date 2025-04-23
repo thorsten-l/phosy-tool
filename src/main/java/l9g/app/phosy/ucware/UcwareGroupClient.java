@@ -16,7 +16,7 @@
 package l9g.app.phosy.ucware;
 
 import java.util.Map;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.WebTarget;
 import l9g.app.phosy.ucware.common.response.UcwareArrayOfIntResponse;
 import l9g.app.phosy.ucware.group.model.UcwareGroup;
 import l9g.app.phosy.ucware.group.response.UcwareAllGroupsResponse;

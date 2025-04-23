@@ -16,7 +16,7 @@
 package l9g.app.phosy.ucware;
 
 import java.util.List;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.WebTarget;
 import l9g.app.phosy.ucware.slot.model.UcwareSlot;
 import l9g.app.phosy.ucware.slot.requestparam.UcwareParamSlot;
 import l9g.app.phosy.ucware.slot.response.UcwareAllSlotsResponse;

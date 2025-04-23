@@ -20,7 +20,7 @@ import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamContact;
 import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamAttribute;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.WebTarget;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContactAttribute;
 import l9g.app.phosy.ucware.phonebook.response.UcwareAttributeResponse;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContact;

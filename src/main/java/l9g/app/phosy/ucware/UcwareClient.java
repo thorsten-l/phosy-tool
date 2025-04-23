@@ -16,9 +16,9 @@
 package l9g.app.phosy.ucware;
 
 import l9g.app.phosy.ucware.common.request.UcwareRequest;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
 import l9g.app.phosy.App;
 import l9g.app.phosy.Options;
 import l9g.app.phosy.ucware.common.response.UcwareResponse;
