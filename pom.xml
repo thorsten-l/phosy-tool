@@ -174,7 +174,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.6.0</version>
+        <version>3.8.1</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>
@@ -243,6 +243,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.7.1</version>
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/app.xml</descriptor>
@@ -298,7 +299,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>3.14.0</version>
         <configuration>
           <debug>false</debug>
           <showDeprecation>true</showDeprecation>
@@ -327,7 +328,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.2.1</version>
+            <version>3.3.1</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -341,7 +342,7 @@
       
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.4.1</version>
+            <version>3.11.2</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
@@ -355,7 +356,7 @@
       
           <plugin>
             <artifactId>maven-deploy-plugin</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.4</version>
             <executions>
               <execution>
                 <id>default-deploy</id>
