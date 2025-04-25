@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>l9g.app</groupId>
   <artifactId>phosy-tool</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
   <packaging>jar</packaging>
 
   <properties>
