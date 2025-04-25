@@ -58,6 +58,8 @@ public class PhonebookHandler
   {
     ucwareClient = UcwareClientFactory.getPhonebookClient(
       App.getConfig().getPhonebookConfig().getUcwareConfig());
+
+    dryRun = App.getOPTIONS().isDryRun();
   }
 
   public static PhonebookHandler getInstance()
@@ -158,13 +160,22 @@ public class PhonebookHandler
       else
       {
         UcwareContact contact = ucwareContactMap.get(syncId);
-        LOGGER.info("{} removing dn={} {} {}", counter++, syncId,
-          contact.getFirstname(), contact.getLastname());
-
-        if (!ucwareClient.deleteUserContact(contact.getUuid()))
+        
+        if (dryRun)
         {
-          LOGGER.error("ERROR: removing contact {}", contact);
-          System.exit(0);
+          LOGGER.info("DRYRUN: {} removing dn={} {} {}", counter++, syncId,
+            contact.getFirstname(), contact.getLastname());
+        }
+        else
+        {
+          LOGGER.info("{} removing dn={} {} {}", counter++, syncId,
+            contact.getFirstname(), contact.getLastname());
+
+          if (!ucwareClient.deleteUserContact(contact.getUuid()))
+          {
+            LOGGER.error("ERROR: removing contact {}", contact);
+            System.exit(0);
+          }
         }
       }
     }
@@ -186,12 +197,19 @@ public class PhonebookHandler
 
       if (ucwareContactMap.containsKey(syncId))
       {
-        LOGGER.info("* updating {}", entry.getDN());
-        ucwareClient.deleteUserContact(ucwareContactMap.get(syncId).getUuid());
+        if (dryRun)
+        {
+          LOGGER.info("DRYRUN: * updating {}", entry.getDN());
+        }
+        else
+        {
+          LOGGER.info("* updating {}", entry.getDN());
+          ucwareClient.deleteUserContact(ucwareContactMap.get(syncId).getUuid());
+        }
       }
       else
       {
-        LOGGER.info("+ creating {}", entry.getDN());
+        LOGGER.info("{}+ creating {}", (dryRun)?"DRYRUN: ":"", entry.getDN());
       }
 
       LOGGER.debug("contactGroup={}", contactGroup);
@@ -225,47 +243,57 @@ public class PhonebookHandler
         syncId
       );
 
-      UcwareContact contact = ucwareClient.addUserContact(
-        contactGroup.getUuid(), pContact);
+      if (!dryRun)
+      {
+        UcwareContact contact = ucwareClient.addUserContact(
+          contactGroup.getUuid(), pContact);
 
-      LOGGER.debug("contact={}", contact);
+        LOGGER.debug("contact={}", contact);
 
-      UcwareParamAttribute pAttribute = new UcwareParamAttribute(
-        "Telefon", phoneNumber,
-        UcwareAttributeType.UCW_PHONENUMBER_HIGH_PRIORITY);
-      ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+        UcwareParamAttribute pAttribute = new UcwareParamAttribute(
+          "Telefon", phoneNumber,
+          UcwareAttributeType.UCW_PHONENUMBER_HIGH_PRIORITY);
+        ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
-      pAttribute = new UcwareParamAttribute(
-        "Email", entryValue(entry, UcwareAttributeType.UCW_EMAIL).toLowerCase(),
-        UcwareAttributeType.UCW_EMAIL);
-      ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+        pAttribute = new UcwareParamAttribute(
+          "Email", entryValue(entry, UcwareAttributeType.UCW_EMAIL).toLowerCase(),
+          UcwareAttributeType.UCW_EMAIL);
+        ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
-      pAttribute = new UcwareParamAttribute("Unternehmen", company,
-        UcwareAttributeType.UCW_COMPANY);
-      ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+        pAttribute = new UcwareParamAttribute("Unternehmen", company,
+          UcwareAttributeType.UCW_COMPANY);
+        ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
-      pAttribute = new UcwareParamAttribute(hyperlink, hyperlink,
-        UcwareAttributeType.UCW_HYPERLINK);
-      ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+        pAttribute = new UcwareParamAttribute(hyperlink, hyperlink,
+          UcwareAttributeType.UCW_HYPERLINK);
+        ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
-      pAttribute = new UcwareParamAttribute(
-        "Abteilung", department, UcwareAttributeType.UCW_DEPARTMENT);
-      ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+        pAttribute = new UcwareParamAttribute(
+          "Abteilung", department, UcwareAttributeType.UCW_DEPARTMENT);
+        ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
-      pAttribute = new UcwareParamAttribute("Funktion", position,
-        UcwareAttributeType.UCW_POSITION);
-      ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+        pAttribute = new UcwareParamAttribute("Funktion", position,
+          UcwareAttributeType.UCW_POSITION);
+        ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
-      counter++;
-      LOGGER.debug("*** counter = {}, {}, {}", counter,
-        contact.getLastname(), contact.getFirstname());
+        counter++;
+        LOGGER.debug("*** counter = {}, {}, {}", counter,
+          contact.getLastname(), contact.getFirstname());
+      }
     }
   }
 
   public void setPhonebookWritable(boolean writable)
   {
-    UcwarePhonebook vpb = ucwareClient.updateUserPhonebook(
-      phonebook.getUuid(), writable);
+    if (dryRun)
+    {
+      LOGGER.info("DRYRUN: - updateUserPhonebook({},{})", phonebook.getUuid(), writable);
+    }
+    else
+    {
+      UcwarePhonebook vpb = ucwareClient.updateUserPhonebook(
+        phonebook.getUuid(), writable);
+    }
   }
 
 // -----------------------------------------------------------------------  
@@ -577,6 +605,8 @@ public class PhonebookHandler
   private final HashMap<String, UcwareContact> ucwareContactMap = new HashMap<>();
 
   private final UcwarePhonebookClient ucwareClient;
+
+  private final boolean dryRun;
 
   private UcwarePhonebook phonebook;
 
