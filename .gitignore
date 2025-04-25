@@ -1,7 +1,9 @@
 target/
 logs/
 config.xml
-config.xml-*
+config.xml.devel
+config.xml.standard
+config.xml.rz-phonebook
 .DS_Store
 aci-sync.log
 ldapmigration.jar
