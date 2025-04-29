@@ -13,14 +13,13 @@ String lastname = ldapUtil.value(UcwareAttributeType.LDAP_SN);
 String phoneNumber = ldapUtil.value(UcwareAttributeType.LDAP_TELEPHONENUMBER);
 String email = ldapUtil.value(UcwareAttributeType.LDAP_MAIL);
 String locality = ldapUtil.value(UcwareAttributeType.LDAP_LOCALITY);
-String externalId = DN.normalize(entry.getDN());
 ArrayList<String> groupNames = new ArrayList<>();
 ArrayList<String> slotTypes = new ArrayList<>();
 ArrayList<Integer> licenses = new ArrayList<>();
 
-String url = "https://www.ostfalia.de/";
+String url = "https://MY_FQDN/";
 String language = "de";
-String authBackend = "ostfalia";
+String authBackend = "MY_DOMAIN";
 boolean privacy = true;
 
 licenses.add(5); // bundle license
@@ -33,17 +32,11 @@ slotTypes.add("ipei");      // DECT phone
 
 switch (locality.toLowerCase())
 {
-  case "wolfenbüttel":
-    groupNames.add("Users-WF");
+  case "MY_LOCALITY_1":
+    groupNames.add("Users-LOC1");
     break;
-  case "wolfsburg":
-    groupNames.add("Users-WOB");
-    break;
-  case "salzgitter":
-    groupNames.add("Users-SZ");
-    break;
-  case "suderburg":
-    groupNames.add("Users-Sud");
+  case "MY_LOCALITY_2":
+    groupNames.add("Users-LOC2");
     break;
 }
 
@@ -56,10 +49,8 @@ username;  // <= Return value
 groupNames.add (
   switch (locality.toLowerCase())
   {
-    case "wolfenbüttel" -> "Users-WF";
-    case "wolfsburg" -> "Users-WOB";
-    case "salzgitter" -> "Users-SZ";
-    case "suderburg" -> "Users-Sud";
+    case "MY_LOCALITY_1" -> "Users-LOC1";
+    case "MY_LOCALITY_2" -> "Users-LOC2";
   }
 );
 */
