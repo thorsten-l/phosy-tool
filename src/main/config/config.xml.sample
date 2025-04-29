@@ -31,7 +31,7 @@
 
     <ucwareConfig>
       <ucwareHost>
-        <apiUrl>https://ucware/ucware/api</apiUrl>
+        <apiUrl>https://my-ucware-server/api/2</apiUrl>
         <ignoreCertificate>true</ignoreCertificate>
       </ucwareHost>
       <credentials>
@@ -73,7 +73,7 @@
 
     <ucwareConfig>
       <ucwareHost>
-        <apiUrl>https://ucware/ucware/api</apiUrl>
+        <apiUrl>https://my-ucware-server/api/2</apiUrl>
         <ignoreCertificate>true</ignoreCertificate>
       </ucwareHost>
       <credentials>
