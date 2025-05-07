@@ -105,10 +105,17 @@ public class TimestampUtil
 
   public void writeCurrentTimestamp() throws IOException
   {
-    LOGGER.info("Writing timestamp to {}", timestampFile.getAbsolutePath());
-    try (PrintWriter out = new PrintWriter(timestampFile))
+    boolean dryRun = App.getOPTIONS().isDryRun();
+    
+    LOGGER.info("{}Writing timestamp to {}",
+      (dryRun)?"DRYRUN: ":"", timestampFile.getAbsolutePath());
+    
+    if (!dryRun)
     {
-      out.println(currentTimestamp.toString());
+      try (PrintWriter out = new PrintWriter(timestampFile))
+      {
+        out.println(currentTimestamp.toString());
+      }
     }
   }
 
