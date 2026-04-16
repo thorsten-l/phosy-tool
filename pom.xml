@@ -14,8 +14,8 @@
     <build.timestamp>${maven.build.timestamp}</build.timestamp>
     <build.profile>default</build.profile>
     <logback.xml>logback.xml</logback.xml>
-    <jaxb.version>4.0.5</jaxb.version>
-    <jackson.version>2.18.3</jackson.version>
+    <jaxb.version>4.0.7</jaxb.version>
+    <jackson.version>2.19.4</jackson.version>
     <maven.compiler.release>11</maven.compiler.release>
   </properties>
   
@@ -24,7 +24,7 @@
       <dependency>
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
-        <version>3.1.10</version>
+        <version>3.1.11</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -35,14 +35,14 @@
     <dependency>
       <groupId>com.unboundid</groupId>
       <artifactId>unboundid-ldapsdk</artifactId>
-      <version>7.0.2</version>
+      <version>7.0.4</version>
     </dependency>
     
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
-      <version>1.18.38</version>
+      <version>1.18.44</version>
     </dependency>
     
       <!-- logging -->
@@ -55,26 +55,26 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.18</version>
+      <version>1.5.32</version>
     </dependency>
 
     <!-- Javax Mail -->
     <dependency>
       <groupId>jakarta.mail</groupId>
       <artifactId>jakarta.mail-api</artifactId>
-      <version>2.1.3</version>
+      <version>2.1.5</version>
     </dependency>
  
     <dependency>
       <groupId>org.eclipse.angus</groupId>
       <artifactId>jakarta.mail</artifactId>
-      <version>2.0.3</version>
+      <version>2.0.5</version>
     </dependency>
         
     <dependency>
       <groupId>jakarta.activation</groupId>
       <artifactId>jakarta.activation-api</artifactId>
-      <version>2.1.3</version>
+      <version>2.1.4</version>
     </dependency>
 
     <dependency>
@@ -119,7 +119,7 @@
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
-      <version>4.0.2</version>
+      <version>4.0.5</version>
     </dependency>
   
     <dependency>
@@ -150,7 +150,7 @@
     <dependency>
       <groupId>com.opencsv</groupId>
       <artifactId>opencsv</artifactId>
-      <version>5.10</version>
+      <version>5.12.0</version>
     </dependency>
     
   </dependencies>
@@ -174,7 +174,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.10.0</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>
@@ -217,7 +217,6 @@
           <logsDirectory>logs</logsDirectory>
           <configurationDirectory>config</configurationDirectory>
           <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
-          <binPrefix>phosy-tool</binPrefix>
           <assembleDirectory>${project.build.directory}/app</assembleDirectory>
           <repositoryLayout>flat</repositoryLayout>
           <repositoryName>lib</repositoryName>
@@ -243,7 +242,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.8.0</version>
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/app.xml</descriptor>
@@ -290,7 +289,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.5.0</version>
         <configuration>
           <encoding>UTF-8</encoding>
           <propertiesEncoding>UTF-8</propertiesEncoding>
@@ -299,10 +298,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.14.0</version>
+        <version>3.15.0</version>
         <configuration>
           <debug>false</debug>
           <showDeprecation>true</showDeprecation>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.44</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
     </plugins>
@@ -328,7 +334,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.3.1</version>
+            <version>3.4.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -342,7 +348,7 @@
       
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.11.2</version>
+            <version>3.12.0</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>

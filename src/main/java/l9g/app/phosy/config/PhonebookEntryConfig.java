@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Thorsten Ludewig (t.ludewig@gmail.com).
+ * Copyright 2024 Thorsten Ludewig (t.ludewig@gmail.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,6 @@ package l9g.app.phosy.config;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlTransient;
-import java.util.List;
-import java.util.Map;
-import l9g.app.phosy.ucware.UcwareAttributeType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,30 +34,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PhonebookConfig implements LdapMapConfig
+public class PhonebookEntryConfig
 {
   @XmlAttribute
-  private boolean enabled;
+  private String dn;
 
-  private String phonebookName;
+  @XmlAttribute
+  private String phonenumber;
 
-  private String phonebookUUID;
-
-  private LdapConfig ldapConfig;
-
-  private UcwareConfig ucwareConfig;
-
-  @XmlElementWrapper(name = "attributeTypeMapping")
-  private List<LdapUcwareType> mapEntry;
-
-  @XmlElementWrapper(name = "entryConfigList")
-  @XmlElement(name = "entry")
-  private List<PhonebookEntryConfig> entryConfig;
-
-  @XmlElementWrapper(name = "additionalEntriesList")
-  @XmlElement(name = "entry")
-  private List<PhonebookAdditionalEntry> additionalEntry;
-
-  @XmlTransient
-  private Map<UcwareAttributeType, String> ldapMap;
+  @XmlAttribute
+  private boolean hide;
 }
