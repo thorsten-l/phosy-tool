@@ -123,6 +123,15 @@ public class Options
   @Setter
   private boolean dryRun = false;
 
+  @Option(
+    name = "--gen-uuid",
+    aliases = "-gu",
+    usage = "Generate a random UUID v4"
+  )
+  @Getter
+  @Setter
+  private boolean genUuid = false;
+
   /**
    * Field description
    */

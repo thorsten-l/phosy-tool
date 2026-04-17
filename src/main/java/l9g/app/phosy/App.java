@@ -174,6 +174,12 @@ public class App
         System.exit(0);
       }
 
+      if (OPTIONS.isGenUuid())
+      {
+        System.out.println(java.util.UUID.randomUUID().toString());
+        System.exit(0);
+      }
+
       if (OPTIONS.isDisplayVersion())
       {
         buildInfo(System.out);
