@@ -13,3 +13,5 @@ secret.*
 var/
 lastsync.timestamp
 lastsync.timestamp*
+GEMINI.md
+CLAUDE.md
