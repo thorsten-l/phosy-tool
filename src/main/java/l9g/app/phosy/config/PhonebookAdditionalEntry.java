@@ -37,10 +37,13 @@ import lombok.ToString;
 public class PhonebookAdditionalEntry
 {
   @XmlAttribute
-  private String uniqdn;
+  private String id;
 
   @XmlAttribute
-  private String name;
+  private String firstname;
+
+  @XmlAttribute
+  private String lastname;
 
   @XmlAttribute
   private String department;

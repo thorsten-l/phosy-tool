@@ -31,11 +31,14 @@ import java.util.UUID;
 import javax.script.Bindings;
 import l9g.app.phosy.App;
 import l9g.app.phosy.Options;
+import l9g.app.phosy.config.PhonebookAdditionalEntry;
 import l9g.app.phosy.config.PhonebookConfig;
+import l9g.app.phosy.config.PhonebookEntryConfig;
 import l9g.app.phosy.ucware.UcwarePhonebookClient;
 import l9g.app.phosy.ucware.UcwareClientFactory;
 import l9g.app.phosy.ucware.UcwareAttributeType;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContact;
+import l9g.app.phosy.ucware.phonebook.model.UcwareContactAttribute;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContactGroup;
 import l9g.app.phosy.ucware.phonebook.model.UcwarePhonebook;
 import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamAttribute;
@@ -49,8 +52,8 @@ import org.slf4j.LoggerFactory;
  */
 public class PhonebookHandler
 {
-  private final static Logger LOGGER
-    = LoggerFactory.getLogger(PhonebookHandler.class.getName());
+  private final static Logger LOGGER =
+    LoggerFactory.getLogger(PhonebookHandler.class.getName());
 
   private final static PhonebookHandler SINGLETON = new PhonebookHandler();
 
@@ -72,10 +75,10 @@ public class PhonebookHandler
     String value = "";
     String attributeName = config.getLdapMap().get(type);
 
-    if (attributeName != null)
+    if(attributeName != null)
     {
       String v = entry.getAttributeValue(attributeName);
-      if (v != null)
+      if(v != null)
       {
         value = v;
       }
@@ -84,33 +87,34 @@ public class PhonebookHandler
     return value;
   }
 
-  public void readContacts() throws Throwable
+  public void readContacts()
+    throws Throwable
   {
     LOGGER.debug("readContacts");
 
     phonebook = null;
 
-    if (config.getPhonebookUUID() != null
+    if(config.getPhonebookUUID() != null
       && config.getPhonebookUUID().trim().length() > 0)
     {
       phonebook = ucwareClient.getUserPhonebookByUUID(
         config.getPhonebookUUID()
       );
 
-      if (phonebook != null)
+      if(phonebook != null)
       {
         LOGGER.info("found phonebook by uuid = {}", phonebook.getUuid());
         contactGroup = phonebook.getGroups().get(0);
       }
     }
 
-    if (phonebook == null)
+    if(phonebook == null)
     {
       phonebook = ucwareClient.getUserPhonebookByName(
         config.getPhonebookName()
       );
 
-      if (phonebook != null)
+      if(phonebook != null)
       {
         LOGGER.info("found phonebook by name = {} with uuid={}",
           phonebook.getName(), phonebook.getUuid());
@@ -129,13 +133,13 @@ public class PhonebookHandler
       }
     }
 
-    if (contactGroup == null)
+    if(contactGroup == null)
     {
       LOGGER.error("No contact group found");
       System.exit(0);
     }
 
-    for (UcwareContact contact : contactGroup.getContacts())
+    for(UcwareContact contact : contactGroup.getContacts())
     {
       LOGGER.debug("syncID={} v={}", contact.getSyncId(), contact);
       ucwareContactMap.put(contact.getSyncId(), contact);
@@ -145,33 +149,34 @@ public class PhonebookHandler
       ucwareContactMap.size(), phonebook.getName());
   }
 
-  public void removeUnknownContacts() throws Throwable
+  public void removeUnknownContacts()
+    throws Throwable
   {
     LOGGER.debug("deleteUnknownContacts");
 
     int counter = 0;
 
-    for (String syncId : ucwareContactMap.keySet())
+    for(String syncId : ucwareContactMap.keySet())
     {
-      if (PhonebookLdapHandler.getLdapEntryMap().containsKey(syncId))
+      if(PhonebookLdapHandler.getLdapEntryMap().containsKey(syncId))
       {
         LOGGER.debug("syncId={} exist", syncId);
       }
       else
       {
         UcwareContact contact = ucwareContactMap.get(syncId);
-        
-        if (dryRun)
+
+        if(dryRun)
         {
-          LOGGER.info("DRYRUN: {} removing dn={} {} {}", counter++, syncId,
+          LOGGER.info("DRYRUN: {} removing dn={} {} {}", counter ++, syncId,
             contact.getFirstname(), contact.getLastname());
         }
         else
         {
-          LOGGER.info("{} removing dn={} {} {}", counter++, syncId,
+          LOGGER.info("{} removing dn={} {} {}", counter ++, syncId,
             contact.getFirstname(), contact.getLastname());
 
-          if (!ucwareClient.deleteUserContact(contact.getUuid()))
+          if( ! ucwareClient.deleteUserContact(contact.getUuid()))
           {
             LOGGER.error("ERROR: removing contact {}", contact);
             System.exit(0);
@@ -181,7 +186,8 @@ public class PhonebookHandler
     }
   }
 
-  public void createUpdateContacts() throws Throwable
+  public void createUpdateContacts()
+    throws Throwable
   {
     LOGGER.debug("createMissingContacts");
 
@@ -191,13 +197,13 @@ public class PhonebookHandler
       UcwareAttributeType.LDAP_GIVENNAME);
     String attributeSn = config.getLdapMap().get(UcwareAttributeType.LDAP_SN);
 
-    for (Entry entry : PhonebookLdapHandler.getLdapEntryMap().values())
+    for(Entry entry : PhonebookLdapHandler.getLdapEntryMap().values())
     {
       String syncId = PhonebookLdapHandler.buildSyncId(entry);
 
-      if (ucwareContactMap.containsKey(syncId))
+      if(ucwareContactMap.containsKey(syncId))
       {
-        if (dryRun)
+        if(dryRun)
         {
           LOGGER.info("DRYRUN: * updating {}", entry.getDN());
         }
@@ -209,7 +215,7 @@ public class PhonebookHandler
       }
       else
       {
-        LOGGER.info("{}+ creating {}", (dryRun)?"DRYRUN: ":"", entry.getDN());
+        LOGGER.info("{}+ creating {}", (dryRun) ? "DRYRUN: " : "", entry.getDN());
       }
 
       LOGGER.debug("contactGroup={}", contactGroup);
@@ -217,14 +223,14 @@ public class PhonebookHandler
       Bindings bindings = PhonebookScriptHandler.getInstance().run(
         config, entry);
 
-      String company = (String) bindings.get("company");
-      String department = (String) bindings.get("department");
-      String hyperlink = (String) bindings.get("hyperlink");
-      String position = (String) bindings.get("position");
-      String phoneNumber = (String) bindings.get("phoneNumber");
-      String prefix = (String) bindings.get("prefix");
-      String suffix = (String) bindings.get("suffix");
-      String locality = (String) bindings.get("locality");
+      String company = (String)bindings.get("company");
+      String department = (String)bindings.get("department");
+      String hyperlink = (String)bindings.get("hyperlink");
+      String position = (String)bindings.get("position");
+      String phoneNumber = (String)bindings.get("phoneNumber");
+      String prefix = (String)bindings.get("prefix");
+      String suffix = (String)bindings.get("suffix");
+      String locality = (String)bindings.get("locality");
 
       LOGGER.debug("company={}", company);
       LOGGER.debug("department={}", department);
@@ -234,7 +240,7 @@ public class PhonebookHandler
       LOGGER.debug("prefix={}", prefix);
       LOGGER.debug("suffix={}", suffix);
       LOGGER.debug("locality={}", locality);
-      
+
       UcwareParamContact pContact = new UcwareParamContact(
         prefix,
         entry.getAttributeValue(attributeGivenName),
@@ -243,7 +249,7 @@ public class PhonebookHandler
         syncId
       );
 
-      if (!dryRun)
+      if( ! dryRun)
       {
         UcwareContact contact = ucwareClient.addUserContact(
           contactGroup.getUuid(), pContact);
@@ -276,7 +282,7 @@ public class PhonebookHandler
           UcwareAttributeType.UCW_POSITION);
         ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
 
-        counter++;
+        counter ++;
         LOGGER.debug("*** counter = {}, {}, {}", counter,
           contact.getLastname(), contact.getFirstname());
       }
@@ -285,7 +291,7 @@ public class PhonebookHandler
 
   public void setPhonebookWritable(boolean writable)
   {
-    if (dryRun)
+    if(dryRun)
     {
       LOGGER.info("DRYRUN: - updateUserPhonebook({},{})", phonebook.getUuid(), writable);
     }
@@ -297,12 +303,13 @@ public class PhonebookHandler
   }
 
 // -----------------------------------------------------------------------  
-  public void exportPhonebook(boolean backup) throws Throwable
+  public void exportPhonebook(boolean backup)
+    throws Throwable
   {
     Options.checkUuidRequired();
     String uuid = App.getOPTIONS().getUuid();
 
-    if (backup)
+    if(backup)
     {
       LOGGER.info("backup phonebook {}", uuid);
     }
@@ -316,7 +323,7 @@ public class PhonebookHandler
 
     UcwarePhonebook exportPhonebook = ucwareClient.getUserPhonebookByUUID(uuid);
 
-    if (backup) // during import all UUIDs will be created
+    if(backup) // during import all UUIDs will be created
     {
       exportPhonebook.setUuid(null);
       exportPhonebook.getGroups().forEach(g ->
@@ -330,11 +337,11 @@ public class PhonebookHandler
       });
     }
 
-    if (exportPhonebook != null)
+    if(exportPhonebook != null)
     {
       ObjectMapper objectMapper = new ObjectMapper();
 
-      try (FileWriter writer = new FileWriter(filename))
+      try(FileWriter writer = new FileWriter(filename))
       {
         objectMapper.writeValue(writer, exportPhonebook);
       }
@@ -345,7 +352,8 @@ public class PhonebookHandler
     }
   }
 
-  public void showInfo() throws Throwable
+  public void showInfo()
+    throws Throwable
   {
     Options.checkUuidOrNameRequired();
 
@@ -355,27 +363,27 @@ public class PhonebookHandler
 
     UcwarePhonebook infoPhonebook = null;
 
-    if (phonebookUuid != null)
+    if(phonebookUuid != null)
     {
       infoPhonebook = ucwareClient.getUserPhonebookByUUID(phonebookUuid);
     }
 
-    if (infoPhonebook == null && phonebookName != null)
+    if(infoPhonebook == null && phonebookName != null)
     {
       infoPhonebook = ucwareClient.getUserPhonebookByName(phonebookName);
     }
 
-    if (infoPhonebook != null)
+    if(infoPhonebook != null)
     {
       LOGGER.info("phonebook name = {}", infoPhonebook.getName());
       LOGGER.info("phonebook uuid = {}", infoPhonebook.getUuid());
 
-      if (verbose)
+      if(verbose)
       {
         LOGGER.info("phonebook # groups = {}", infoPhonebook.getGroups().
           size());
         int numberOfContacts = 0;
-        for (UcwareContactGroup group : infoPhonebook.getGroups())
+        for(UcwareContactGroup group : infoPhonebook.getGroups())
         {
           LOGGER.info("  - phonebook groups name = {}", group.getName());
           LOGGER.info("  - phonebook groups # contacts = {}",
@@ -407,8 +415,9 @@ public class PhonebookHandler
     ucwareClient.deleteUserPhonebook(phonebookUuid);
   }
 
-  public void importPhonebookCSV(String filename) throws IOException,
-                                                         CsvValidationException
+  public void importPhonebookCSV(String filename)
+    throws IOException,
+           CsvValidationException
   {
     LOGGER.debug("importPhonebookCSV");
     LOGGER.info("CSV import");
@@ -418,19 +427,18 @@ public class PhonebookHandler
     phonebook = ucwareClient.getUserPhonebookByName(name);
     contactGroup = phonebook.getGroups().get(0);
 
-    if (phonebook == null)
+    if(phonebook == null)
     {
       LOGGER.error("Phonebook {} not found!", name);
       System.exit(0);
     }
 
-    try (
-      FileReader fileReader = new FileReader(filename);
-      CSVReader csvReader = new CSVReaderBuilder(fileReader).withCSVParser(
+    try(
+      FileReader fileReader = new FileReader(filename); CSVReader csvReader = new CSVReaderBuilder(fileReader).withCSVParser(
         new CSVParserBuilder().withSeparator(';').build()).build())
     {
       String[] line;
-      while ((line = csvReader.readNext()) != null)
+      while((line = csvReader.readNext()) != null)
       {
         LOGGER.debug(line[2]);
 
@@ -496,7 +504,8 @@ public class PhonebookHandler
     }
   }
 
-  public void importPhonebookJSON(String filename) throws IOException
+  public void importPhonebookJSON(String filename)
+    throws IOException
   {
     LOGGER.info("JSON import");
     ObjectMapper objectMapper = new ObjectMapper();
@@ -508,14 +517,14 @@ public class PhonebookHandler
 
     phonebook = ucwareClient.getUserPhonebookByName(importPhonebook.getName());
 
-    if (phonebook != null)
+    if(phonebook != null)
     {
       LOGGER.debug("phonebook != null");
       ucwareClient.deleteUserPhonebook(phonebook.getUuid());
     }
 
-    phonebook
-      = ucwareClient.newUserPhonebook(importPhonebook.getName(), false);
+    phonebook =
+      ucwareClient.newUserPhonebook(importPhonebook.getName(), false);
 
     LOGGER.debug("phonebook={}", phonebook);
 
@@ -528,9 +537,9 @@ public class PhonebookHandler
       LOGGER.debug("phonebook group = {} {}", cg.getName(), cg.getUuid());
       boolean found = false;
 
-      for (UcwareContactGroup cg1 : ctGroup)
+      for(UcwareContactGroup cg1 : ctGroup)
       {
-        if (cg.getName().equals(cg1.getName()))
+        if(cg.getName().equals(cg1.getName()))
         {
           found = true;
           contactGroup = cg1;
@@ -540,7 +549,7 @@ public class PhonebookHandler
 
       LOGGER.debug("found = {}", found);
 
-      if (!found)
+      if( ! found)
       {
         contactGroup = ucwareClient
           .addUserContactGroup(phonebook.getUuid(), cg.getName());
@@ -562,21 +571,22 @@ public class PhonebookHandler
             new UcwareParamAttribute(a.getName(), a.getValue(), a.getType()));
         });
 
-        counter++;
+        counter ++;
         LOGGER.info("counter={} {} {}", counter, contact.getFirstname(),
           contact.getLastname());
       });
     });
   }
 
-  public void importPhonebook() throws IOException, CsvValidationException
+  public void importPhonebook()
+    throws IOException, CsvValidationException
   {
     LOGGER.debug("importPhonebook");
     Options.checkFilenameRequired();
 
     String filename = App.getOPTIONS().getFilename();
 
-    if (!new File(filename).exists())
+    if( ! new File(filename).exists())
     {
       LOGGER.error("File {} not found!", filename);
       System.exit(0);
@@ -584,11 +594,11 @@ public class PhonebookHandler
 
     LOGGER.info("Importing file '{}'", filename);
 
-    if (filename.toLowerCase().endsWith(".csv"))
+    if(filename.toLowerCase().endsWith(".csv"))
     {
       importPhonebookCSV(filename);
     }
-    else if (filename.toLowerCase().endsWith(".json"))
+    else if(filename.toLowerCase().endsWith(".json"))
     {
       importPhonebookJSON(filename);
     }
@@ -597,6 +607,98 @@ public class PhonebookHandler
       LOGGER.error("CSV or JSON files allowed only.", filename);
       System.exit(0);
     }
+  }
+
+  public void overrideEntries()
+    throws IOException
+  {
+    LOGGER.debug("overrideEntries");
+
+    String prefix = config.getPhonebookName() + ":";
+
+    for(PhonebookEntryConfig entryConfig : config.getEntryConfig())
+    {
+      LOGGER.trace("override Entry : {}", entryConfig);
+
+      String syncId = prefix + entryConfig.getDn().toLowerCase();
+
+      UcwareContact contact = ucwareContactMap.get(syncId);
+
+      if(contact == null)
+      {
+        LOGGER.warn("Contact '{}' not found.", syncId);
+      }
+      else
+      {
+        if(entryConfig.isHide())
+        {
+          LOGGER.debug("{}Contact {} is hidden - remove from phonbook", dryRun ? "DRYRUN: " : "", syncId);
+          if( ! dryRun)
+          {
+            ucwareClient.deleteUserContact(contact.getUuid());
+          }
+        }
+        else if(entryConfig.getPhonenumber() != null &&  ! entryConfig.getPhonenumber().isBlank())
+        {
+          LOGGER.debug("{}Contact {} update phonenumber {}", dryRun ? "DRYRUN: " : "", syncId, entryConfig.getPhonenumber());
+          if( ! dryRun)
+          {
+            for(UcwareContactAttribute attribute : contact.getAttributes())
+            {
+              if(attribute.getType() == UcwareAttributeType.UCW_PHONENUMBER_HIGH_PRIORITY)
+              {
+                attribute.setValue(entryConfig.getPhonenumber());
+                ucwareClient.updateAttribute(attribute);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  public void addAdditionalEntries()
+    throws IOException
+  {
+    LOGGER.debug("addAdditionalEntries");
+    String prefix = config.getPhonebookName() + ":";
+
+    for(PhonebookAdditionalEntry entry : config.getAdditionalEntry())
+    {
+      LOGGER.debug("additional Entry : {}", entry);
+      if( ! dryRun)
+      {
+        String syncId = prefix + entry.getId();
+        LOGGER.debug("ADDITIONAL: {} {}", syncId, entry.getLastname());
+        LOGGER.debug("contactGroup={}", contactGroup);
+
+        UcwareParamContact pContact = new UcwareParamContact(
+          "" /* prefix: Dr., Prof */,
+          entry.getFirstname(),
+          entry.getLastname(),
+          "" /* suffix: B. Sc. */,
+          syncId
+        );
+
+        UcwareContact contact = ucwareClient.addUserContact(
+          contactGroup.getUuid(), pContact);
+
+        LOGGER.debug("additional contact={}", contact);
+
+        UcwareParamAttribute pAttribute = new UcwareParamAttribute(
+          "Telefon", entry.getPhonenumber(),
+          UcwareAttributeType.UCW_PHONENUMBER_HIGH_PRIORITY);
+        ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+
+        if(entry.getDepartment() != null &&  ! entry.getDepartment().isBlank())
+        {
+          pAttribute = new UcwareParamAttribute(
+            "Abteilung", entry.getDepartment(), UcwareAttributeType.UCW_DEPARTMENT);
+          ucwareClient.addUserContactAttribute(contact.getUuid(), pAttribute);
+        }
+      }
+    }
+
   }
 
   private final static PhonebookConfig config = App.getConfig().
@@ -613,4 +715,5 @@ public class PhonebookHandler
   private UcwareContactGroup contactGroup;
 
   private int counter;
+
 }

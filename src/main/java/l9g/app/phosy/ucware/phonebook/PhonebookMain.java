@@ -95,6 +95,9 @@ public class PhonebookMain
         phonebookHandler.createUpdateContacts();
       }
       
+      phonebookHandler.overrideEntries();
+      phonebookHandler.addAdditionalEntries();
+      
       phonebookHandler.setPhonebookWritable(false);
       timestampUtil.writeCurrentTimestamp();
     }

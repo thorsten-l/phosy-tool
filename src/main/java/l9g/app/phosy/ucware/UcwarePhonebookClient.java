@@ -21,6 +21,8 @@ import l9g.app.phosy.ucware.phonebook.requestparam.UcwareParamAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.ws.rs.client.WebTarget;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContactAttribute;
 import l9g.app.phosy.ucware.phonebook.response.UcwareAttributeResponse;
 import l9g.app.phosy.ucware.phonebook.model.UcwareContact;
@@ -41,8 +43,8 @@ import org.slf4j.LoggerFactory;
  */
 public class UcwarePhonebookClient extends UcwareClient
 {
-  private final static Logger LOGGER
-    = LoggerFactory.getLogger(UcwarePhonebookClient.class.getName());
+  private final static Logger LOGGER =
+    LoggerFactory.getLogger(UcwarePhonebookClient.class.getName());
 
   public UcwarePhonebookClient(WebTarget target)
   {
@@ -53,8 +55,8 @@ public class UcwarePhonebookClient extends UcwareClient
   {
     LOGGER.debug("getAllUserPhonebooks()");
 
-    UcwareAllPhonebooksResponse response
-      = postRequest("getAll", UcwareAllPhonebooksResponse.class);
+    UcwareAllPhonebooksResponse response =
+      postRequest("getAll", UcwareAllPhonebooksResponse.class);
 
     final ArrayList<UcwarePhonebook> result = new ArrayList<>();
 
@@ -180,9 +182,9 @@ public class UcwarePhonebookClient extends UcwareClient
 
     List<UcwarePhonebook> phonebooks = getAllUserPhonebooks();
 
-    for (UcwarePhonebook p : phonebooks)
+    for(UcwarePhonebook p : phonebooks)
     {
-      if (p.getName().equals(name))
+      if(p.getName().equals(name))
       {
         phonebook = p;
         break;
@@ -206,4 +208,18 @@ public class UcwarePhonebookClient extends UcwareClient
 
     return response.getPhonebook();
   }
+
+  public UcwareContactAttribute updateAttribute(UcwareContactAttribute contactAttribute)
+  {
+    UcwareContactAttribute response = postRequest(
+      "updateAttribute",
+      new Object[]
+      {
+        contactAttribute
+      },
+      UcwareContactAttribute.class, false);
+
+    return response;
+  }
+
 }

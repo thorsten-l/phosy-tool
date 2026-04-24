@@ -43,6 +43,7 @@ public class UcwareContactAttribute
 
   private String name;
 
+  @Setter
   private String value;
 
   @NotNull
