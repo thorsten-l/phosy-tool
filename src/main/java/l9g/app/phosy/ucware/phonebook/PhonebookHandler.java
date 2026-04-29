@@ -612,13 +612,13 @@ public class PhonebookHandler
   public void overrideEntries()
     throws IOException
   {
-    LOGGER.debug("overrideEntries");
+    LOGGER.info("overrideEntries");
 
     String prefix = config.getPhonebookName() + ":";
 
     for(PhonebookEntryConfig entryConfig : config.getEntryConfig())
     {
-      LOGGER.trace("override Entry : {}", entryConfig);
+      LOGGER.info("override Entry : {}", entryConfig);
 
       String syncId = prefix + entryConfig.getDn().toLowerCase();
 
@@ -632,7 +632,7 @@ public class PhonebookHandler
       {
         if(entryConfig.isHide())
         {
-          LOGGER.debug("{}Contact {} is hidden - remove from phonbook", dryRun ? "DRYRUN: " : "", syncId);
+          LOGGER.debug("{}Contact {} is hidden - remove from phonebook", dryRun ? "DRYRUN: " : "", syncId);
           if( ! dryRun)
           {
             ucwareClient.deleteUserContact(contact.getUuid());
@@ -660,12 +660,12 @@ public class PhonebookHandler
   public void addAdditionalEntries()
     throws IOException
   {
-    LOGGER.debug("addAdditionalEntries");
+    LOGGER.info("addAdditionalEntries");
     String prefix = config.getPhonebookName() + ":";
 
     for(PhonebookAdditionalEntry entry : config.getAdditionalEntry())
     {
-      LOGGER.debug("additional Entry : {}", entry);
+      LOGGER.info("additional Entry : {}", entry);
       if( ! dryRun)
       {
         String syncId = prefix + entry.getId();
